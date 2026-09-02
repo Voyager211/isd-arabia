@@ -18,6 +18,7 @@ import type {
 import { MAX_CATEGORY_DEPTH } from '@isd/shared-types';
 
 import { toSlug } from '@/common/utils/slug.util';
+import { MemoryCacheService } from '@/common/services/memory-cache.service';
 import { notDeleted } from '@/database/schema.helpers';
 import { CacheTag, RevalidationService } from '@/modules/revalidation/revalidation.service';
 import { Product, ProductDocument } from '@/modules/products/product.schema';
@@ -44,21 +45,27 @@ export class CategoryService {
     @InjectModel(Category.name) private readonly categoryModel: Model<CategoryDocument>,
     @InjectModel(Product.name) private readonly productModel: Model<ProductDocument>,
     private readonly revalidation: RevalidationService,
+    private readonly cache: MemoryCacheService,
   ) {}
+
+  /** Prefix for every cache key this service owns. */
+  private static readonly CACHE_PREFIX = 'categories:';
 
   // ── Public reads ────────────────────────────────────────────────────────
 
   /** Full active tree. Used by the storefront filter sidebar and the admin. */
   async getTree(includeInactive = false): Promise<CategoryNode[]> {
-    const filter = includeInactive ? notDeleted() : { ...notDeleted(), isActive: true };
+    return this.cache.wrap(`${CategoryService.CACHE_PREFIX}tree:${includeInactive}`, async () => {
+      const filter = includeInactive ? notDeleted() : { ...notDeleted(), isActive: true };
 
-    const categories = await this.categoryModel
-      .find(filter)
-      .sort({ level: 1, displayOrder: 1, name: 1 })
-      .lean()
-      .exec();
+      const categories = await this.categoryModel
+        .find(filter)
+        .sort({ level: 1, displayOrder: 1, name: 1 })
+        .lean()
+        .exec();
 
-    return buildTree(categories.map(toFlat));
+      return buildTree(categories.map(toFlat));
+    });
   }
 
   async getFlat(includeInactive = false): Promise<CategoryDto[]> {
@@ -79,6 +86,10 @@ export class CategoryService {
    * possible and carries the `categories:menu` cache tag.
    */
   async getMenu(): Promise<MenuCategory[]> {
+    return this.cache.wrap(`${CategoryService.CACHE_PREFIX}menu`, () => this.buildMenu());
+  }
+
+  private async buildMenu(): Promise<MenuCategory[]> {
     const categories = await this.categoryModel
       .find({ ...notDeleted(), isActive: true, showInMenu: true })
       .select('name slug level parent image')
@@ -283,6 +294,7 @@ export class CategoryService {
       })),
     );
 
+    this.cache.invalidate(CategoryService.CACHE_PREFIX);
     this.revalidation.revalidate([CacheTag.categoriesMenu, CacheTag.categoriesTree, CacheTag.home]);
     return { updated: result.modifiedCount };
   }
@@ -512,6 +524,10 @@ export class CategoryService {
    * dropped too, or it keeps serving under a slug that no longer resolves.
    */
   private revalidateFor(slug: string, previousSlug?: string): void {
+    // Drop the in-process cache before telling the storefront to re-fetch —
+    // otherwise the purge triggers a request that is served the stale tree.
+    this.cache.invalidate(CategoryService.CACHE_PREFIX);
+
     const tags = [
       CacheTag.categoriesMenu,
       CacheTag.categoriesTree,

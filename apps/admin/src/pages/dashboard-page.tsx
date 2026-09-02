@@ -8,14 +8,15 @@ import { PageHeader } from '@/components/ui/page-header';
 import { StatCard } from '@/components/ui/stat-card';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { DataTable, type Column } from '@/components/ui/data-table';
+import { QuotationChart } from '@/components/dashboard/quotation-chart';
+import { StatusBreakdown } from '@/components/dashboard/status-breakdown';
 
 /**
  * Dashboard (PROJECT_PLAN.md §11.3).
  *
- * Phase 1 wires the four stat cards and the recent-quotations table against
- * `/admin/dashboard/stats`. The quotations-by-status breakdown and the
- * eight-week bar chart land in Phase 5 alongside the stats endpoint's own
- * aggregation work.
+ * Four stat cards, the status breakdown, an eight-week chart and the ten most
+ * recent requests — everything the client needs to answer "what came in and
+ * what still needs working" without opening another screen.
  */
 
 const RECENT_COLUMNS: Column<QuotationSummary>[] = [
@@ -96,6 +97,13 @@ export function DashboardPage() {
           hint="Last 30 days"
         />
       </div>
+
+      {stats ? (
+        <div className="mt-4 grid gap-3 lg:grid-cols-2">
+          <StatusBreakdown counts={stats.quotationsByStatus} />
+          <QuotationChart weeks={stats.quotationsPerWeek} />
+        </div>
+      ) : null}
 
       <section className="mt-6">
         <h2 className="mb-3 font-display text-h3 font-semibold text-surface-inverse">

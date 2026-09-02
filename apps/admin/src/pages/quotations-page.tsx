@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router';
 import { Download } from 'lucide-react';
 
 import type { QuotationStatus, QuotationSummary } from '@isd/shared-types';
@@ -29,8 +30,25 @@ const STATUS_LABELS: Record<QuotationStatus, string> = {
 };
 
 export function QuotationsPage() {
+  /**
+   * The initial status filter comes from the query string, so the dashboard's
+   * status breakdown can link straight into a pre-filtered table. After mount
+   * the filters are plain component state — this screen is behind a login and
+   * has no shareable-URL requirement, unlike the storefront listing.
+   */
+  const [searchParams] = useSearchParams();
+
   const [search, setSearch] = useState('');
-  const [statuses, setStatuses] = useState<QuotationStatus[]>([]);
+  const [statuses, setStatuses] = useState<QuotationStatus[]>(() => {
+    const requested = searchParams.get('status');
+    if (!requested) return [];
+
+    return requested
+      .split(',')
+      .filter((value): value is QuotationStatus =>
+        QUOTATION_STATUSES.includes(value as QuotationStatus),
+      );
+  });
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [page, setPage] = useState(1);

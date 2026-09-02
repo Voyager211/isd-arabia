@@ -6,6 +6,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { AppConfigModule } from './config/config.module';
 import { AppConfigService } from './config/config.service';
 import { DatabaseModule } from './database/database.module';
+import { CacheModule } from './common/services/cache.module';
 import { CounterModule } from './database/counter.module';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { AuthModule } from './modules/auth/auth.module';
@@ -66,6 +67,7 @@ import { SecurityModule } from './modules/security/security.module';
     ThrottlerModule.forRoot([{ name: 'default', ttl: 60_000, limit: 100 }]),
 
     DatabaseModule,
+    CacheModule,
     CounterModule,
     RevalidationModule,
     MailModule,
