@@ -1,0 +1,15 @@
+{
+  "name": "@isd/design-tokens",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Design tokens shared by the storefront and admin apps",
+  "type": "module",
+  "exports": {
+    "./tokens.css": "./tokens.css",
+    "./theme.css": "./theme.css"
+  },
+  "files": [
+    "tokens.css",
+    "theme.css"
+  ]
+}

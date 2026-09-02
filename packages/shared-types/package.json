@@ -1,0 +1,29 @@
+{
+  "name": "@isd/shared-types",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Entity and DTO types shared by the API, storefront and admin",
+  "main": "./dist/cjs/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "npm run build:cjs && npm run build:esm && npm run build:pkg",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist",
+    "build:cjs": "tsc -p tsconfig.build.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:pkg": "node ./scripts/write-dist-package-json.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

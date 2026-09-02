@@ -1,0 +1,110 @@
+@import 'tailwindcss';
+@import '@isd/design-tokens/tokens.css';
+@import '@isd/design-tokens/theme.css';
+
+/*
+ * Same tokens as the storefront, different density (PROJECT_PLAN.md §11.1).
+ *
+ * The admin is a data-dense tool, not a marketing surface: smaller base type,
+ * tighter rows, tabular figures everywhere. Re-declaring the token values here
+ * would let the two apps drift — only the density is overridden.
+ */
+@layer base {
+  html {
+    font-size: 15px;
+  }
+
+  body {
+    background-color: var(--surface-sunken);
+    color: var(--text-primary);
+    font-size: var(--text-body-sm);
+    line-height: var(--text-body-sm-lh);
+  }
+
+  /* Every figure the client scans down a column of. */
+  table,
+  input[type='number'],
+  [data-tabular] {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  .field-label {
+    display: block;
+    margin-block-end: var(--space-1);
+    font-size: var(--text-caption);
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  .field-input {
+    width: 100%;
+    padding: 7px var(--space-3);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-control);
+    background-color: var(--surface-page);
+    font-size: var(--text-body-sm);
+    line-height: var(--text-body-sm-lh);
+    color: var(--text-primary);
+  }
+
+  .field-input:focus {
+    border-color: var(--action-secondary);
+  }
+
+  .field-input[aria-invalid='true'] {
+    border-color: var(--status-lost);
+  }
+
+  .field-error {
+    margin-block-start: var(--space-1);
+    font-size: var(--text-caption);
+    color: var(--status-lost);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: 7px var(--space-4);
+    border-radius: var(--radius-control);
+    font-size: var(--text-body-sm);
+    font-weight: 600;
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  /* In the admin the accent marks the primary action of the screen — the
+     admin has no commercial funnel to protect it for. */
+  .btn-accent {
+    background-color: var(--action-primary);
+    color: var(--action-primary-text);
+  }
+
+  .btn-accent:hover:not(:disabled) {
+    background-color: var(--action-primary-hover);
+  }
+
+  .btn-ghost {
+    border: 1px solid var(--border-subtle);
+    background-color: var(--surface-page);
+    color: var(--text-primary);
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    border-color: var(--border-strong);
+  }
+
+  .panel {
+    background-color: var(--surface-page);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-resting);
+  }
+}

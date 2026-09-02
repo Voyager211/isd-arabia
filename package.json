@@ -1,0 +1,35 @@
+{
+  "name": "isd-arabia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "B2B industrial catalogue and quotation platform — welding and MRO consumables, Saudi Arabia",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "dev:api": "npm run build:types && npm run dev --workspace @isd/api",
+    "dev:storefront": "npm run build:types && npm run dev --workspace @isd/storefront",
+    "dev:admin": "npm run build:types && npm run dev --workspace @isd/admin",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,css,md}\"",
+    "seed": "npm run build:types && npm run seed --workspace @isd/api",
+    "build:types": "npm run build --workspace @isd/shared-types"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.6",
+    "typescript": "^5.9.3"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "unrs-resolver@1.12.2": true,
+    "mongodb-memory-server@11.2.0": true
+  }
+}

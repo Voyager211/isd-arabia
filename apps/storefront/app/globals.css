@@ -1,0 +1,136 @@
+@import 'tailwindcss';
+@import '@isd/design-tokens/tokens.css';
+@import '@isd/design-tokens/theme.css';
+
+/*
+ * next/font assigns the families to CSS variables on <html> (see layout.tsx).
+ * Re-point the token primitives at them so the whole token system resolves to
+ * the self-hosted faces with no layout shift, and the fallback stacks stay in
+ * place for the moment before they load.
+ */
+:root {
+  --font-display: var(--font-barlow-condensed), 'Arial Narrow', system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--surface-page);
+    color: var(--text-primary);
+    font-size: var(--text-body);
+    line-height: var(--text-body-lh);
+  }
+
+  /*
+   * Body copy is capped at 68ch where it is applied. Product descriptions are
+   * dense technical prose and long measures make them unreadable.
+   */
+  .prose-measure {
+    max-width: 68ch;
+  }
+}
+
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: var(--container-max);
+    margin-inline: auto;
+    padding-inline: var(--space-4);
+  }
+
+  @media (min-width: 768px) {
+    .container-page {
+      padding-inline: var(--space-6);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container-page {
+      padding-inline: var(--space-8);
+    }
+  }
+
+  /*
+   * The accent button. Reserved for quote actions and the catalogue download —
+   * it is the loudest thing on the page and must always mean "this moves you
+   * toward a commercial conversation".
+   */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: 10px var(--space-4);
+    border-radius: var(--radius-control);
+    background-color: var(--action-primary);
+    color: var(--action-primary-text);
+    font-weight: 600;
+    font-size: var(--text-body-sm);
+    line-height: var(--text-body-sm-lh);
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--action-primary-hover);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: 10px var(--space-4);
+    border-radius: var(--radius-control);
+    border: 1px solid var(--border-subtle);
+    background-color: var(--surface-page);
+    color: var(--action-secondary);
+    font-weight: 600;
+    font-size: var(--text-body-sm);
+    line-height: var(--text-body-sm-lh);
+    transition:
+      border-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--action-secondary);
+    color: var(--action-secondary-hover);
+  }
+
+  /* Visible only to keyboard users, per the accessibility floor. */
+  .skip-link {
+    position: absolute;
+    inset-inline-start: var(--space-4);
+    top: -100px;
+    z-index: var(--z-toast);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-control);
+    background-color: var(--surface-inverse);
+    color: var(--text-on-inverse);
+    transition: top var(--duration-fast) var(--ease-out);
+  }
+
+  .skip-link:focus {
+    top: var(--space-4);
+  }
+}
+
+/* The single orchestrated hero entrance (PROJECT_PLAN.md §5.4). Deliberately
+   the only keyframe animation on the site — no scroll-triggered fade-and-slide
+   on every section. Applied with motion-safe:, so it does not run under
+   prefers-reduced-motion. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

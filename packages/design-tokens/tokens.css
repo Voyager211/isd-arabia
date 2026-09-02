@@ -1,0 +1,146 @@
+/*
+ * Design tokens — ISD Arabia
+ * PROJECT_PLAN.md §5.1
+ *
+ * Two layers, and the distinction is load-bearing:
+ *   primitives  — raw values. Only the semantic layer may reference them.
+ *   semantic    — what components use. Components reference NOTHING else.
+ *
+ * ── ACTION ITEM (PROJECT_PLAN.md §5.1, §18 #1) ────────────────────────────
+ * The four --brand-* primitives below are the approved placeholder direction.
+ * Sample the computed header / primary CTA / footer colours from
+ * primearabiagroup.com, confirm with the client, and replace them here.
+ * Everything else derives, so this stays a five-minute change.
+ * ──────────────────────────────────────────────────────────────────────────
+ */
+
+:root {
+  /* ── Primitives: brand ─────────────────────────────────────────────── */
+  --brand-deep: #0b2545; /* deep industrial navy — headers, footer */
+  --brand-primary: #1b4b8f; /* primary blue — links, active states */
+  --brand-accent: #e8760c; /* warm signal orange — CTAs, quote actions */
+  --brand-accent-dk: #c25e05; /* accent hover / pressed */
+
+  /* ── Primitives: neutrals ──────────────────────────────────────────── */
+  --n-000: #ffffff;
+  --n-050: #f7f8fa;
+  --n-100: #edeff3;
+  --n-200: #dce0e8;
+  --n-400: #9aa3b2;
+  --n-600: #5a6474;
+  --n-800: #2a3140;
+  --n-900: #161b24;
+
+  /* ── Primitives: quotation status ──────────────────────────────────── */
+  --status-new: #2563eb;
+  --status-review: #d97706;
+  --status-quoted: #7c3aed;
+  --status-won: #059669;
+  --status-lost: #dc2626;
+  --status-cancelled: var(--n-600);
+
+  /* ── Semantic: surfaces ────────────────────────────────────────────── */
+  --surface-page: var(--n-000);
+  --surface-raised: var(--n-050);
+  --surface-sunken: var(--n-100);
+  --surface-inverse: var(--brand-deep);
+
+  /* ── Semantic: text ────────────────────────────────────────────────── */
+  --text-primary: var(--n-900);
+  --text-secondary: var(--n-600);
+  --text-muted: var(--n-400);
+  --text-on-inverse: var(--n-000);
+  --text-on-accent: var(--n-000);
+
+  /* ── Semantic: borders ─────────────────────────────────────────────── */
+  --border-subtle: var(--n-200);
+  --border-strong: var(--n-400);
+
+  /* ── Semantic: actions ─────────────────────────────────────────────────
+   * --action-primary is the orange. It is reserved for quote actions and the
+   * catalogue download. It is the loudest thing on the page and must always
+   * mean "this moves you toward a commercial conversation."
+   * Not for decoration, dividers, or generic emphasis.
+   */
+  --action-primary: var(--brand-accent);
+  --action-primary-hover: var(--brand-accent-dk);
+  --action-primary-text: var(--text-on-accent);
+  --action-secondary: var(--brand-primary);
+  --action-secondary-hover: var(--brand-deep);
+
+  /* ── Semantic: focus ───────────────────────────────────────────────── */
+  --focus-ring: var(--brand-primary);
+  --focus-ring-inverse: var(--n-000);
+
+  /* ── Radius (PROJECT_PLAN.md §5.3) ─────────────────────────────────────
+   * Hierarchy comes partly from not giving everything the same radius.
+   */
+  --radius-control: 4px; /* inputs, buttons */
+  --radius-card: 6px; /* cards, panels */
+  --radius-none: 0; /* header bar, full-bleed sections */
+
+  /* ── Elevation — two levels only, nothing else gets a shadow ───────── */
+  --shadow-resting: 0 1px 2px 0 rgb(22 27 36 / 0.06), 0 1px 3px 0 rgb(22 27 36 / 0.08);
+  --shadow-overlay: 0 10px 15px -3px rgb(22 27 36 / 0.12), 0 4px 6px -4px rgb(22 27 36 / 0.1);
+
+  /* ── Spacing scale ─────────────────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* ── Layout ────────────────────────────────────────────────────────── */
+  --container-max: 1320px;
+
+  /* ── Typography ────────────────────────────────────────────────────────
+   * Display: Barlow Condensed — long product names fit a card in two lines
+   * instead of three. Body/UI/data: Inter — strong at small sizes, tabular
+   * figures for spec and admin tables.
+   */
+  --font-display: 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* 1.25 major third, 16px base — size / line-height */
+  --text-display: 2.5rem; /* 40 / 44 */
+  --text-display-lh: 2.75rem;
+  --text-h1: 2rem; /* 32 / 38 */
+  --text-h1-lh: 2.375rem;
+  --text-h2: 1.625rem; /* 26 / 32 */
+  --text-h2-lh: 2rem;
+  --text-h3: 1.25rem; /* 20 / 26 */
+  --text-h3-lh: 1.625rem;
+  --text-body-lg: 1.125rem; /* 18 / 28 */
+  --text-body-lg-lh: 1.75rem;
+  --text-body: 1rem; /* 16 / 26 */
+  --text-body-lh: 1.625rem;
+  --text-body-sm: 0.875rem; /* 14 / 22 */
+  --text-body-sm-lh: 1.375rem;
+  --text-caption: 0.8125rem; /* 13 / 18 */
+  --text-caption-lh: 1.125rem;
+
+  /* ── Motion ────────────────────────────────────────────────────────── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+
+  /* ── Z-index ladder ────────────────────────────────────────────────── */
+  --z-header: 40;
+  --z-dropdown: 50;
+  --z-drawer: 60;
+  --z-modal: 70;
+  --z-toast: 80;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+  }
+}

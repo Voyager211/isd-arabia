@@ -1,0 +1,122 @@
+/*
+ * Tailwind v4 theme bridge — ISD Arabia
+ *
+ * Tailwind v4 is CSS-first: there is no JS preset. This file maps the semantic
+ * tokens in tokens.css into Tailwind's theme namespaces so utilities like
+ * `bg-surface-raised`, `text-secondary`, `rounded-card`, `shadow-resting` and
+ * `font-display` exist and resolve to the tokens.
+ *
+ * `@theme inline` is deliberate: it keeps the utilities pointing at the
+ * var(--token) reference rather than baking in the resolved value, so
+ * re-theming still only requires editing tokens.css.
+ *
+ * Consume from an app's global stylesheet:
+ *     @import 'tailwindcss';
+ *     @import '@isd/design-tokens/tokens.css';
+ *     @import '@isd/design-tokens/theme.css';
+ */
+
+@theme inline {
+  /* Colours — semantic only. Primitives are intentionally not exposed as
+     utilities; a component reaching for --n-400 directly is a review comment. */
+  --color-surface-page: var(--surface-page);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-inverse: var(--surface-inverse);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-on-inverse: var(--text-on-inverse);
+  --color-text-on-accent: var(--text-on-accent);
+
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+
+  --color-action-primary: var(--action-primary);
+  --color-action-primary-hover: var(--action-primary-hover);
+  --color-action-secondary: var(--action-secondary);
+  --color-action-secondary-hover: var(--action-secondary-hover);
+
+  --color-focus-ring: var(--focus-ring);
+
+  --color-status-new: var(--status-new);
+  --color-status-review: var(--status-review);
+  --color-status-quoted: var(--status-quoted);
+  --color-status-won: var(--status-won);
+  --color-status-lost: var(--status-lost);
+  --color-status-cancelled: var(--status-cancelled);
+
+  /* Type */
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+
+  --text-display: var(--text-display);
+  --text-display--line-height: var(--text-display-lh);
+  --text-h1: var(--text-h1);
+  --text-h1--line-height: var(--text-h1-lh);
+  --text-h2: var(--text-h2);
+  --text-h2--line-height: var(--text-h2-lh);
+  --text-h3: var(--text-h3);
+  --text-h3--line-height: var(--text-h3-lh);
+  --text-body-lg: var(--text-body-lg);
+  --text-body-lg--line-height: var(--text-body-lg-lh);
+  --text-body: var(--text-body);
+  --text-body--line-height: var(--text-body-lh);
+  --text-body-sm: var(--text-body-sm);
+  --text-body-sm--line-height: var(--text-body-sm-lh);
+  --text-caption: var(--text-caption);
+  --text-caption--line-height: var(--text-caption-lh);
+
+  /* Radius — three values, used deliberately */
+  --radius-control: var(--radius-control);
+  --radius-card: var(--radius-card);
+
+  /* Elevation — two levels only */
+  --shadow-resting: var(--shadow-resting);
+  --shadow-overlay: var(--shadow-overlay);
+
+  /* Layout */
+  --container-page: var(--container-max);
+
+  /* Motion */
+  --ease-out: var(--ease-out);
+}
+
+/* Breakpoints per PROJECT_PLAN.md §5.3 match Tailwind defaults
+   (sm 640 / md 768 / lg 1024 / xl 1280) so they are not redefined. */
+
+@layer base {
+  html {
+    font-family: var(--font-body);
+    color: var(--text-primary);
+    background-color: var(--surface-page);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  h2,
+  h3 {
+    font-weight: 600;
+  }
+
+  /* Accessibility floor: a visible focus ring on everything interactive.
+     Never `outline: none` without a replacement. */
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* Spec tables, admin tables and quantity fields align on the decimal. */
+  table,
+  [data-tabular] {
+    font-variant-numeric: tabular-nums;
+  }
+}
