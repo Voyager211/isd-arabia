@@ -134,3 +134,25 @@
     transform: translateY(0);
   }
 }
+
+@layer components {
+  /* Shared input styling for the public-facing forms. */
+  .form-input {
+    width: 100%;
+    padding: 9px var(--space-3);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-control);
+    background-color: var(--surface-page);
+    font-size: var(--text-body-sm);
+    line-height: var(--text-body-sm-lh);
+    color: var(--text-primary);
+  }
+
+  .form-input:focus {
+    border-color: var(--action-secondary);
+  }
+
+  .form-input[aria-invalid='true'] {
+    border-color: var(--status-lost);
+  }
+}

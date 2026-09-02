@@ -21,6 +21,9 @@ import { IndustryModule } from './modules/industries/industry.module';
 import { ProductModule } from './modules/products/product.module';
 import { SearchModule } from './modules/search/search.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { QuotationModule } from './modules/quotations/quotation.module';
+import { MailModule } from './modules/mail/mail.module';
+import { SecurityModule } from './modules/security/security.module';
 
 @Module({
   imports: [
@@ -64,6 +67,8 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     DatabaseModule,
     CounterModule,
     RevalidationModule,
+    MailModule,
+    SecurityModule,
     UploadsModule,
     AuthModule,
     HealthModule,
@@ -76,6 +81,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     IndustryModule,
     ProductModule,
     SearchModule,
+    QuotationModule,
     DashboardModule,
   ],
   providers: [

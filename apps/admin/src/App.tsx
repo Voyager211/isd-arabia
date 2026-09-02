@@ -15,6 +15,7 @@ import { CategoriesPage } from '@/pages/categories-page';
 import { TaxonomyPage } from '@/pages/taxonomy-page';
 import { ProductsPage } from '@/pages/products-page';
 import { ProductFormPage } from '@/pages/product-form-page';
+import { QuotationsPage } from '@/pages/quotations-page';
 import { PlaceholderPage } from '@/pages/placeholder-page';
 import { NotFoundPage } from '@/pages/not-found-page';
 
@@ -54,10 +55,7 @@ export function App() {
                   another". */}
               <Route path="products/new" element={<ProductFormPage />} />
               <Route path="products/:id" element={<ProductFormPage />} />
-              <Route
-                path="quotations"
-                element={<PlaceholderPage title="Quotations" phase="Phase 3" />}
-              />
+              <Route path="quotations" element={<QuotationsPage />} />
               <Route
                 path="catalogue"
                 element={<PlaceholderPage title="Catalogue" phase="Phase 4" />}

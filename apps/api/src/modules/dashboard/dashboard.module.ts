@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { Category, CategorySchema } from '@/modules/categories/category.schema';
 import { Product, ProductSchema } from '@/modules/products/product.schema';
+import { QuotationModule } from '@/modules/quotations/quotation.module';
 import { DashboardService } from './dashboard.service';
 import { DashboardController } from './dashboard.controller';
 
@@ -12,6 +13,7 @@ import { DashboardController } from './dashboard.controller';
       { name: Product.name, schema: ProductSchema },
       { name: Category.name, schema: CategorySchema },
     ]),
+    QuotationModule,
   ],
   controllers: [DashboardController],
   providers: [DashboardService],
