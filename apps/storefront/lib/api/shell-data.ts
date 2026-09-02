@@ -1,6 +1,6 @@
-import type { Industry, MenuCategory } from '@isd/shared-types';
+import type { CataloguePublic, Industry, MenuCategory } from '@isd/shared-types';
 
-import { getIndustries, getMenu } from './catalogue';
+import { getActiveCatalogue, getIndustries, getMenu } from './catalogue';
 
 /**
  * Data the global shell needs on every page.
@@ -13,16 +13,20 @@ import { getIndustries, getMenu } from './catalogue';
 export interface ShellData {
   menu: MenuCategory[];
   industries: Pick<Industry, '_id' | 'name' | 'slug'>[];
+  /** Null when nothing is published; the download buttons then render nothing. */
+  catalogue: CataloguePublic | null;
 }
 
 export async function getShellData(): Promise<ShellData> {
-  const [menu, industries] = await Promise.all([
+  const [menu, industries, catalogue] = await Promise.all([
     getMenu().catch(() => [] as MenuCategory[]),
     getIndustries().catch(() => [] as Industry[]),
+    getActiveCatalogue().catch(() => null),
   ]);
 
   return {
     menu,
     industries: industries.slice(0, 9).map(({ _id, name, slug }) => ({ _id, name, slug })),
+    catalogue,
   };
 }

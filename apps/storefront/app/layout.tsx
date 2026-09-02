@@ -64,7 +64,7 @@ export const viewport: Viewport = {
  * the reason we chose Next.js (CLAUDE.md §4).
  */
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const { menu, industries } = await getShellData();
+  const { menu, industries, catalogue } = await getShellData();
 
   return (
     <html lang="en" dir="ltr" className={`${barlowCondensed.variable} ${inter.variable}`}>
@@ -74,13 +74,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {t.common.skipToContent}
           </a>
 
-          <SiteHeader menu={menu} />
+          <SiteHeader menu={menu} catalogue={catalogue} />
 
           <main id="main" className="flex-1">
             {children}
           </main>
 
-          <SiteFooter industries={industries} />
+          <SiteFooter industries={industries} catalogue={catalogue} />
 
           <CartDrawer />
           {/* Sonner has no logical-property position; bottom-right is the LTR

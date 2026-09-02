@@ -9,6 +9,7 @@ import { notDeleted } from '@/database/schema.helpers';
 import { Category, CategoryDocument } from '@/modules/categories/category.schema';
 import { Product, ProductDocument } from '@/modules/products/product.schema';
 import { QuotationService } from '@/modules/quotations/quotation.service';
+import { CatalogueService } from '@/modules/catalogue/catalogue.service';
 
 /**
  * Admin dashboard counts (PROJECT_PLAN.md §11.3).
@@ -17,9 +18,6 @@ import { QuotationService } from '@/modules/quotations/quotation.service';
  * field, and they all run in parallel. This screen loads on every sign-in, so
  * it must not become the slowest page in the admin on a shared-CPU tier.
  *
- * The catalogue-download figure stays at zero until Phase 4 adds the leads
- * collection; the shape is already correct so the admin needs no change when
- * the data arrives.
  */
 @Injectable()
 export class DashboardService {
@@ -30,16 +28,21 @@ export class DashboardService {
     @InjectModel(Product.name) private readonly productModel: Model<ProductDocument>,
     @InjectModel(Category.name) private readonly categoryModel: Model<CategoryDocument>,
     private readonly quotations: QuotationService,
+    private readonly catalogue: CatalogueService,
   ) {}
 
   async getStats(): Promise<DashboardStats> {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setUTCDate(sevenDaysAgo.getUTCDate() - 7);
 
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setUTCDate(thirtyDaysAgo.getUTCDate() - 30);
+
     const [
       totalProducts,
       totalCategories,
       newQuotationsLast7Days,
+      catalogueDownloadsLast30Days,
       byStatus,
       quotationsPerWeek,
       recentQuotations,
@@ -47,6 +50,7 @@ export class DashboardService {
       this.productModel.countDocuments({ ...notDeleted(), isActive: true }).exec(),
       this.categoryModel.countDocuments({ ...notDeleted(), isActive: true }).exec(),
       this.quotations.countSince(sevenDaysAgo),
+      this.catalogue.countLeadsSince(thirtyDaysAgo),
       this.quotations.countByStatus(),
       this.quotations.countPerWeek(DashboardService.CHART_WEEKS),
       this.quotations.findRecent(DashboardService.RECENT_QUOTATION_LIMIT),
@@ -56,7 +60,7 @@ export class DashboardService {
       totalProducts,
       totalCategories,
       newQuotationsLast7Days,
-      catalogueDownloadsLast30Days: 0,
+      catalogueDownloadsLast30Days,
       // Every status is present, including the ones with no rows — the
       // breakdown should read as a zero rather than a missing bar.
       quotationsByStatus: {

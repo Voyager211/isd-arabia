@@ -1,6 +1,12 @@
-import type { Brand, CategoryNode, Industry, MenuCategory } from '@isd/shared-types';
+import type {
+  Brand,
+  CategoryNode,
+  CataloguePublic,
+  Industry,
+  MenuCategory,
+} from '@isd/shared-types';
 
-import { apiGet, Revalidate } from './server';
+import { apiGet, apiGetOrNull, Revalidate } from './server';
 import { tags } from './tags';
 
 /**
@@ -41,6 +47,19 @@ export function getBrands(): Promise<Brand[]> {
 export function getIndustries(): Promise<Industry[]> {
   return apiGet<Industry[]>('/industries', {
     tags: [tags.industriesList],
+    revalidate: Revalidate.hour,
+  });
+}
+
+/**
+ * The active catalogue's public metadata.
+ *
+ * Carries no file URL when the download is gated — the API withholds it, so
+ * the storefront never has the asset address to leak.
+ */
+export function getActiveCatalogue(): Promise<CataloguePublic | null> {
+  return apiGetOrNull<CataloguePublic>('/catalogue/active', {
+    tags: [tags.catalogue],
     revalidate: Revalidate.hour,
   });
 }

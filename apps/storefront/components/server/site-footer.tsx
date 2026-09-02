@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 
-import type { Industry } from '@isd/shared-types';
+import type { CataloguePublic, Industry } from '@isd/shared-types';
 import { t } from '@/lib/i18n/en';
 import { CONTACT, SOCIAL } from '@/lib/site-config';
 import { CatalogueDownloadButton } from '@/components/client/catalogue-download-button';
@@ -14,8 +14,10 @@ import { CatalogueDownloadButton } from '@/components/client/catalogue-download-
  */
 export function SiteFooter({
   industries,
+  catalogue,
 }: {
   industries: Pick<Industry, '_id' | 'name' | 'slug'>[];
+  catalogue: CataloguePublic | null;
 }) {
   const year = new Date().getFullYear();
 
@@ -27,7 +29,7 @@ export function SiteFooter({
           <p className="mt-3 max-w-[38ch] text-body-sm text-white/70">{t.brand.tagline}</p>
 
           <div className="mt-6">
-            <CatalogueDownloadButton />
+            <CatalogueDownloadButton catalogue={catalogue} />
           </div>
 
           <a

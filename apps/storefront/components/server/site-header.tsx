@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { Clock, Mail, Phone } from 'lucide-react';
 
-import type { MenuCategory } from '@isd/shared-types';
+import type { CataloguePublic, MenuCategory } from '@isd/shared-types';
 import { t } from '@/lib/i18n/en';
 import { CartButton } from '@/components/client/cart-button';
+import { CatalogueDownloadLink } from '@/components/client/catalogue-download-link';
 import { MegaMenu } from '@/components/client/mega-menu';
 import { MobileNav } from '@/components/client/mobile-nav';
 import { SearchBox } from '@/components/client/search-box';
@@ -21,7 +22,13 @@ import { CONTACT } from '@/lib/site-config';
  * Only the genuinely interactive leaves are client components — the mega-menu
  * panel, the search box, the cart button and the mobile drawer.
  */
-export function SiteHeader({ menu }: { menu: MenuCategory[] }) {
+export function SiteHeader({
+  menu,
+  catalogue,
+}: {
+  menu: MenuCategory[];
+  catalogue: CataloguePublic | null;
+}) {
   return (
     <header className="sticky top-0 z-40 bg-surface-page shadow-resting">
       {/* Band 1 — utility. Hidden below md; the information is duplicated in
@@ -48,6 +55,9 @@ export function SiteHeader({ menu }: { menu: MenuCategory[] }) {
               <Clock aria-hidden className="size-3.5" />
               {t.utility.hours}
             </span>
+            {catalogue ? (
+              <CatalogueDownloadLink className="hover:underline" catalogue={catalogue} />
+            ) : null}
           </div>
         </div>
       </div>

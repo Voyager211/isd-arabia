@@ -16,7 +16,7 @@ import { TaxonomyPage } from '@/pages/taxonomy-page';
 import { ProductsPage } from '@/pages/products-page';
 import { ProductFormPage } from '@/pages/product-form-page';
 import { QuotationsPage } from '@/pages/quotations-page';
-import { PlaceholderPage } from '@/pages/placeholder-page';
+import { CataloguePage } from '@/pages/catalogue-page';
 import { NotFoundPage } from '@/pages/not-found-page';
 
 /**
@@ -26,9 +26,6 @@ import { NotFoundPage } from '@/pages/not-found-page';
  *   RequireAnonymous       login only
  *   RequirePasswordChange  the forced rotation, reachable only mid-rotation
  *   RequireAuth            everything else
- *
- * The catalogue screens are stubbed here so the shell, navigation and guards
- * are exercisable end to end from Phase 1; each is filled in over Phases 2–5.
  */
 export function App() {
   return (
@@ -56,10 +53,7 @@ export function App() {
               <Route path="products/new" element={<ProductFormPage />} />
               <Route path="products/:id" element={<ProductFormPage />} />
               <Route path="quotations" element={<QuotationsPage />} />
-              <Route
-                path="catalogue"
-                element={<PlaceholderPage title="Catalogue" phase="Phase 4" />}
-              />
+              <Route path="catalogue" element={<CataloguePage />} />
             </Route>
           </Route>
 

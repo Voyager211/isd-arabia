@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, PackageSearch, ShieldCheck, Truck } from 'lucide-react';
 
 import { t } from '@/lib/i18n/en';
-import { getMenu } from '@/lib/api/catalogue';
+import { getActiveCatalogue, getMenu } from '@/lib/api/catalogue';
 import { CatalogueDownloadButton } from '@/components/client/catalogue-download-button';
 
 /**
@@ -18,7 +18,10 @@ import { CatalogueDownloadButton } from '@/components/client/catalogue-download-
 export const revalidate = 3600;
 
 export default async function HomePage() {
-  const menu = await getMenu().catch(() => []);
+  const [menu, catalogue] = await Promise.all([
+    getMenu().catch(() => []),
+    getActiveCatalogue().catch(() => null),
+  ]);
   const topCategories = menu.flatMap((group) => group.children).slice(0, 8);
 
   return (
@@ -126,7 +129,7 @@ export default async function HomePage() {
               reference and internal circulation.
             </p>
           </div>
-          <CatalogueDownloadButton className="shrink-0" />
+          <CatalogueDownloadButton catalogue={catalogue} className="shrink-0" />
         </div>
       </section>
     </>

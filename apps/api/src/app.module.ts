@@ -22,6 +22,7 @@ import { ProductModule } from './modules/products/product.module';
 import { SearchModule } from './modules/search/search.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { QuotationModule } from './modules/quotations/quotation.module';
+import { CatalogueModule } from './modules/catalogue/catalogue.module';
 import { MailModule } from './modules/mail/mail.module';
 import { SecurityModule } from './modules/security/security.module';
 
@@ -82,6 +83,7 @@ import { SecurityModule } from './modules/security/security.module';
     ProductModule,
     SearchModule,
     QuotationModule,
+    CatalogueModule,
     DashboardModule,
   ],
   providers: [
