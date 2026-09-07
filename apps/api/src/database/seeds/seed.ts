@@ -11,6 +11,7 @@ import { Industry, IndustrySchema } from '@/modules/industries/industry.schema';
 import { Product, ProductSchema } from '@/modules/products/product.schema';
 import { toSlug } from '@/common/utils/slug.util';
 import { generateProducts } from './demo-products.data';
+import { explainConnectionError } from './connection-hints';
 import {
   SEED_BRANDS,
   SEED_CATEGORY_TREE,
@@ -345,6 +346,12 @@ async function main() {
 }
 
 main().catch((error: Error) => {
-  console.error(`Seed failed: ${error.message}`);
+  console.error(`\nSeed failed: ${error.message}\n`);
+
+  // Environmental failures get an explanation; anything else is a real bug and
+  // the raw message is the most useful thing to show.
+  const hint = explainConnectionError(error);
+  if (hint) console.error(`${hint}\n`);
+
   process.exitCode = 1;
 });
