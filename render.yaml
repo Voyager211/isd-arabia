@@ -24,8 +24,14 @@ services:
     branch: main
     healthCheckPath: /api/v1/health
 
+    # --include=dev is required, not optional: NODE_ENV=production is set below
+    # for the running service, and npm ci honours it by skipping
+    # devDependencies — which is where @nestjs/cli and typescript live. Without
+    # the flag the install succeeds and the build then fails on "nest: not
+    # found".
+    #
     # shared-types is built first; the API compiles against its dist output.
-    buildCommand: npm ci && npm run build:types && npm run build --workspace @isd/api
+    buildCommand: npm ci --include=dev && npm run build:types && npm run build --workspace @isd/api
     startCommand: node apps/api/dist/main.js
 
     envVars:
