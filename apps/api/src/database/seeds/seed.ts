@@ -2,7 +2,8 @@ import 'reflect-metadata';
 import * as bcrypt from 'bcryptjs';
 import mongoose, { Model, Types } from 'mongoose';
 
-import { validateEnv } from '@/config/env.schema';
+import { validateSeedEnv, type SeedEnv } from '@/config/seed-env.schema';
+import { loadEnvFile } from '@/config/load-env';
 import { AdminUser, AdminUserSchema } from '@/modules/auth/admin-user.schema';
 import { Brand, BrandSchema } from '@/modules/brands/brand.schema';
 import { Category, CategorySchema } from '@/modules/categories/category.schema';
@@ -56,7 +57,7 @@ function parseCount(argv: string[]): number {
   return Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 20_000) : 1500;
 }
 
-async function seedAdmin(model: Model<AdminUser>, env: ReturnType<typeof validateEnv>) {
+async function seedAdmin(model: Model<AdminUser>, env: SeedEnv) {
   const isProduction = env.NODE_ENV === 'production';
 
   /**
@@ -213,7 +214,7 @@ async function seedDemoProducts(
   categoryModel: Model<Category>,
   brandModel: Model<Brand>,
   industryModel: Model<Industry>,
-  env: ReturnType<typeof validateEnv>,
+  env: SeedEnv,
   count: number,
 ) {
   if (env.NODE_ENV === 'production') {
@@ -294,7 +295,10 @@ async function seedDemoProducts(
 }
 
 async function main() {
-  const env = validateEnv(process.env);
+  // ts-node entry point: nothing has loaded .env for us.
+  loadEnvFile();
+
+  const env = validateSeedEnv(process.env);
   const sections = parseSections(process.argv.slice(2));
   const demoCount = parseCount(process.argv.slice(2));
 

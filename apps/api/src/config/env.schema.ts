@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { expandCloudinaryUrl } from './cloudinary-url';
+
 /**
  * Environment contract (PROJECT_PLAN.md §14.3).
  *
@@ -48,6 +50,8 @@ export const envSchema = z
     CLOUDINARY_API_KEY: z.string().min(1),
     CLOUDINARY_API_SECRET: z.string().min(1),
     CLOUDINARY_UPLOAD_FOLDER: z.string().min(1).default('isd-arabia'),
+    /** Accepted as an alternative to the three variables above (see below). */
+    CLOUDINARY_URL: z.string().optional(),
 
     // ── CORS (never '*' with credentials) ───────────────────────────────
     STOREFRONT_ORIGIN: z.string().url(),
@@ -102,7 +106,9 @@ export type Env = z.infer<typeof envSchema>;
  * its gaps in one pass.
  */
 export function validateEnv(raw: Record<string, unknown>): Env {
-  const result = envSchema.safeParse(raw);
+  // CLOUDINARY_URL is what the Cloudinary console hands you; expand it into
+  // the three discrete variables before validating.
+  const result = envSchema.safeParse(expandCloudinaryUrl(raw));
 
   if (!result.success) {
     const lines = result.error.issues.map(

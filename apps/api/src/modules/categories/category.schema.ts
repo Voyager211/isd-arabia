@@ -42,7 +42,7 @@ export class Category {
    * parent change — and when a parent moves, it rebuilds `ancestors` for every
    * descendant in one bulkWrite (§7.2).
    */
-  @Prop({ type: [MongooseSchema.Types.ObjectId], ref: 'Category', default: [], index: true })
+  @Prop({ type: [MongooseSchema.Types.ObjectId], ref: 'Category', default: [] })
   ancestors: Types.ObjectId[];
 
   /**

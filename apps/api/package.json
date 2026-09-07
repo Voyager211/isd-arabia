@@ -17,7 +17,8 @@
     "seed:admin": "ts-node -r tsconfig-paths/register src/database/seeds/seed.ts --only=admin",
     "seed:taxonomy": "ts-node -r tsconfig-paths/register src/database/seeds/seed.ts --only=taxonomy",
     "test:all": "jest && jest --config ./test/jest-e2e.js --runInBand",
-    "seed:demo": "ts-node -r tsconfig-paths/register src/database/seeds/seed.ts --only=demo"
+    "seed:demo": "ts-node -r tsconfig-paths/register src/database/seeds/seed.ts --only=demo",
+    "verify:cloudinary": "ts-node -r tsconfig-paths/register src/database/seeds/verify-cloudinary.ts"
   },
   "dependencies": {
     "@isd/shared-types": "*",
