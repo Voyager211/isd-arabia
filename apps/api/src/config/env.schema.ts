@@ -1,6 +1,11 @@
 import { z } from 'zod';
 
 import { expandCloudinaryUrl } from './cloudinary-url';
+import {
+  SEEDED_DEFAULT_EMAIL,
+  SEEDED_DEFAULT_PASSWORD,
+  checkPasswordPolicy,
+} from '@/modules/auth/password.policy';
 
 /**
  * Environment contract (PROJECT_PLAN.md §14.3).
@@ -105,16 +110,54 @@ export const envSchema = z
     TURNSTILE_ENABLED: bool.default('true'),
   })
   .superRefine((env, ctx) => {
-    // Guardrail 1 of PROJECT_PLAN.md §12.1: the documented default credential
-    // is fine for local and staging, and must never reach a live admin panel.
+    /**
+     * Guardrail 1 of PROJECT_PLAN.md §12.1.
+     *
+     * The documented default credential is right for local and staging, and
+     * must never reach a live admin panel: `@Password123` on a predictable
+     * `superadmin@` address at a public URL is guessable by an automated
+     * scanner within minutes.
+     *
+     * Checking only that the variables are SET is not enough — nothing stops
+     * someone pasting the documented values into the production dashboard,
+     * which is exactly the outcome this exists to prevent. So the values
+     * themselves are rejected, and the password must satisfy the same policy
+     * the change-password endpoint enforces.
+     */
     if (env.NODE_ENV === 'production') {
       if (!env.SEED_ADMIN_EMAIL || !env.SEED_ADMIN_PASSWORD) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['SEED_ADMIN_EMAIL'],
-          message:
-            'SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD are required in production — the default seed credential is refused.',
+          message: 'SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD are required in production.',
         });
+      }
+
+      if (env.SEED_ADMIN_EMAIL?.toLowerCase() === SEEDED_DEFAULT_EMAIL) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['SEED_ADMIN_EMAIL'],
+          message: `SEED_ADMIN_EMAIL cannot be the documented default '${SEEDED_DEFAULT_EMAIL}' in production — it is the first address any scanner tries.`,
+        });
+      }
+
+      if (env.SEED_ADMIN_PASSWORD === SEEDED_DEFAULT_PASSWORD) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['SEED_ADMIN_PASSWORD'],
+          message: 'SEED_ADMIN_PASSWORD cannot be the documented default password in production.',
+        });
+      }
+
+      if (env.SEED_ADMIN_PASSWORD) {
+        const policy = checkPasswordPolicy(env.SEED_ADMIN_PASSWORD);
+        if (!policy.valid) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['SEED_ADMIN_PASSWORD'],
+            message: `SEED_ADMIN_PASSWORD is too weak for production. ${policy.message}`,
+          });
+        }
       }
       if (env.TURNSTILE_ENABLED === false) {
         ctx.addIssue({

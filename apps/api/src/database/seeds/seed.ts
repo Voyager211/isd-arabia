@@ -10,6 +10,11 @@ import { Category, CategorySchema } from '@/modules/categories/category.schema';
 import { Industry, IndustrySchema } from '@/modules/industries/industry.schema';
 import { Product, ProductSchema } from '@/modules/products/product.schema';
 import { toSlug } from '@/common/utils/slug.util';
+import {
+  SEEDED_DEFAULT_EMAIL,
+  SEEDED_DEFAULT_PASSWORD,
+  checkPasswordPolicy,
+} from '@/modules/auth/password.policy';
 import { generateProducts } from './demo-products.data';
 import { explainConnectionError } from './connection-hints';
 import {
@@ -71,11 +76,30 @@ async function seedAdmin(model: Model<AdminUser>, env: SeedEnv) {
    * is the second line of defence, because the seed can be run as a standalone
    * script that bypasses Nest's bootstrap entirely.
    */
-  if (isProduction && (!env.SEED_ADMIN_EMAIL || !env.SEED_ADMIN_PASSWORD)) {
-    throw new Error(
-      'Refusing to seed the default super admin in production. ' +
-        'Set SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD.',
-    );
+  if (isProduction) {
+    if (!env.SEED_ADMIN_EMAIL || !env.SEED_ADMIN_PASSWORD) {
+      throw new Error(
+        'Refusing to seed a super admin in production without SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD.',
+      );
+    }
+
+    // Presence is not enough — the whole point is that these specific values
+    // never reach a live admin panel, and nothing stops someone pasting the
+    // documented ones into a production dashboard.
+    if (env.SEED_ADMIN_EMAIL.toLowerCase() === SEEDED_DEFAULT_EMAIL) {
+      throw new Error(
+        `Refusing to seed '${SEEDED_DEFAULT_EMAIL}' in production — it is the first address any scanner tries.`,
+      );
+    }
+
+    if (env.SEED_ADMIN_PASSWORD === SEEDED_DEFAULT_PASSWORD) {
+      throw new Error('Refusing to seed the documented default password in production.');
+    }
+
+    const policy = checkPasswordPolicy(env.SEED_ADMIN_PASSWORD);
+    if (!policy.valid) {
+      throw new Error(`SEED_ADMIN_PASSWORD is too weak for production. ${policy.message}`);
+    }
   }
 
   const email = (env.SEED_ADMIN_EMAIL ?? DEFAULT_ADMIN.email).toLowerCase();

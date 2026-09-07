@@ -7,6 +7,7 @@ import { PASSWORD_MIN_LENGTH, PASSWORD_POLICY_MESSAGE } from '@isd/shared-types'
  * default, so "change the password" cannot be satisfied by re-entering it.
  */
 export const SEEDED_DEFAULT_PASSWORD = '@Password123';
+export const SEEDED_DEFAULT_EMAIL = 'superadmin@example.com';
 
 export interface PasswordCheck {
   valid: boolean;
