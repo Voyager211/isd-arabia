@@ -116,3 +116,43 @@ Beyond the acceptance criteria in PROJECT_PLAN.md §19:
 - [ ] Point UptimeRobot at `/api/v1/health`.
 - [ ] Schedule the `mongodump` backup job.
 - [ ] Verify listing queries use `IXSCAN` via `explain()` against real data.
+
+---
+
+## Status
+
+Phases 0–6 of the delivery plan are built and verified. Phase 7 (staging
+deploy, UAT) needs real infrastructure and is not something the codebase can
+complete on its own.
+
+| Phase            | State | Notes                                                  |
+| ---------------- | ----- | ------------------------------------------------------ |
+| 0. Planning      | Done  | Tokens, schema, API contract, CLAUDE.md                |
+| 1. Foundation    | Done  | Auth, config, uploads, revalidation, health, seeds     |
+| 2. Catalogue     | Done  | Taxonomy + products, facets, listing pages, PDP, admin |
+| 3. Quotation     | Done  | Submission, snapshots, admin table, notification email |
+| 4. Catalogue PDF | Done  | Gated download, signed URLs, leads, admin tabs         |
+| 5. Content & SEO | Done  | Home, About, Contact, JSON-LD, sitemap, dashboard      |
+| 6. Hardening     | Done  | Lint/CI, rate limits, headers, index verification      |
+| 7. QA & deploy   | Open  | Needs Atlas, Cloudinary, Render and Vercel accounts    |
+
+**Verification:** 39 unit and 100 end-to-end tests; typecheck, lint,
+format-check and build clean across all five workspaces. CI runs the same
+sequence on every push.
+
+### Not yet done, and why
+
+- **Lighthouse and the responsive/a11y sweep.** Both need the app running
+  against real data. The targets in `PROJECT_PLAN.md` §15.1 have not been
+  measured — the code was written to them, which is not the same thing.
+- **Facet performance at catalogue scale** (§17.1 risk 4). The `$facet`
+  aggregation is verified correct against fixtures and the listing query is
+  verified index-backed via `explain()`, but neither has been run against
+  1,000+ products. Do this before Phase 7, not during.
+- **Brand colours.** `packages/design-tokens/tokens.css` still holds the
+  placeholder direction from §5.1. Sampling and confirming them is a
+  five-minute change that re-themes everything.
+- **Contact details.** `apps/storefront/lib/site-config.ts` has placeholders.
+- **Arabic.** The two cheap habits from §18 are in place throughout — UI
+  strings in a locale file, logical properties everywhere — so this stays a
+  scoped follow-on. The decision itself is still open.
