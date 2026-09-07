@@ -62,13 +62,21 @@ export const envSchema = z
     STOREFRONT_REVALIDATE_URL: z.string().url(),
     REVALIDATE_SECRET: z.string().min(16, 'REVALIDATE_SECRET must be at least 16 characters'),
 
-    // ── Mail — internal notification only ───────────────────────────────
-    SMTP_HOST: z.string().min(1),
+    /**
+     * Mail — the internal quotation notification, and nothing else.
+     *
+     * Optional at this level and required conditionally below: with
+     * `QUOTATION_NOTIFY_ENABLED=false` there is nothing to send, so demanding
+     * SMTP credentials would block local development on a feature that is
+     * switched off — and push people into inventing placeholder values, which
+     * is worse than not checking.
+     */
+    SMTP_HOST: z.string().optional(),
     SMTP_PORT: z.coerce.number().int().positive().default(587),
-    SMTP_USER: z.string().min(1),
-    SMTP_PASSWORD: z.string().min(1),
-    MAIL_FROM: z.string().min(1),
-    QUOTATION_NOTIFY_TO: z.string().min(1),
+    SMTP_USER: z.string().optional(),
+    SMTP_PASSWORD: z.string().optional(),
+    MAIL_FROM: z.string().optional(),
+    QUOTATION_NOTIFY_TO: z.string().optional(),
     QUOTATION_NOTIFY_ENABLED: bool.default('true'),
 
     // ── Spam ────────────────────────────────────────────────────────────
@@ -93,6 +101,33 @@ export const envSchema = z
           code: z.ZodIssueCode.custom,
           path: ['TURNSTILE_ENABLED'],
           message: 'TURNSTILE_ENABLED cannot be false in production.',
+        });
+      }
+    }
+
+    /**
+     * Mail is required only when it is switched on.
+     *
+     * Enabling notifications without somewhere to send them is a
+     * misconfiguration that would otherwise surface as a logged failure on
+     * the first real quotation — the one moment nobody is watching the logs.
+     */
+    if (env.QUOTATION_NOTIFY_ENABLED) {
+      const missing = (
+        [
+          ['SMTP_HOST', env.SMTP_HOST],
+          ['SMTP_USER', env.SMTP_USER],
+          ['SMTP_PASSWORD', env.SMTP_PASSWORD],
+          ['MAIL_FROM', env.MAIL_FROM],
+          ['QUOTATION_NOTIFY_TO', env.QUOTATION_NOTIFY_TO],
+        ] as const
+      ).filter(([, value]) => !value);
+
+      for (const [key] of missing) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [key],
+          message: `${key} is required while QUOTATION_NOTIFY_ENABLED is true. Set it, or set QUOTATION_NOTIFY_ENABLED=false to run without notifications.`,
         });
       }
     }
