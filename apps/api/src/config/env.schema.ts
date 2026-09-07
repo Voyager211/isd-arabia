@@ -40,6 +40,26 @@ export const envSchema = z
     BCRYPT_ROUNDS: z.coerce.number().int().min(10).max(15).default(12),
     COOKIE_DOMAIN: z.string().optional(),
 
+    /**
+     * Set true when the admin and the API are on DIFFERENT registrable
+     * domains — for example admin.vercel.app calling api.onrender.com.
+     *
+     * Auth cookies are SameSite=Strict by default, which is correct when both
+     * sit under one parent domain (admin.example.com + api.example.com, the
+     * arrangement PROJECT_PLAN.md §14.4 assumes). Across different domains a
+     * Strict cookie is simply never sent, so login succeeds and every
+     * subsequent request is a 401 — with nothing in any log to explain it.
+     *
+     * Switching this on relaxes the cookies to SameSite=None; Secure. CSRF
+     * protection then rests on the CORS allowlist rather than the browser's
+     * same-site rule: the endpoints accept only application/json, which a
+     * cross-site form cannot send, and the resulting preflight is refused for
+     * any origin not in STOREFRONT_ORIGIN / ADMIN_ORIGIN.
+     *
+     * Prefer a shared parent domain over this whenever you control the DNS.
+     */
+    COOKIE_CROSS_SITE: bool.default('false'),
+
     // ── Admin seed (PROJECT_PLAN.md §12.1) ──────────────────────────────
     SEED_ADMIN_EMAIL: z.string().email().optional(),
     SEED_ADMIN_PASSWORD: z.string().optional(),

@@ -95,6 +95,18 @@ services:
       - key: REVALIDATE_SECRET
         sync: false
 
+      # ── Auth cookies across two different domains ────────────────────────
+      # The admin (*.vercel.app) and this API (*.onrender.com) are different
+      # registrable domains, so every admin request is cross-site and a
+      # SameSite=Strict cookie would never be sent — login would succeed and
+      # every call after it would 401, with nothing in the logs to say why.
+      #
+      # Set this back to false once both sit under one parent domain
+      # (admin.example.com + api.example.com), which is the stronger position
+      # and what PROJECT_PLAN.md §14.4 assumes.
+      - key: COOKIE_CROSS_SITE
+        value: 'true'
+
       # ── Required: Cloudflare Turnstile ───────────────────────────────────
       # Free, and mandatory in production — the schema refuses to let
       # TURNSTILE_ENABLED be false there. Guards the quotation and catalogue

@@ -13,27 +13,36 @@ export const REFRESH_TOKEN_COOKIE = 'isd_rt';
  * `sameSite: 'none'` in development would be needed for a cross-origin dev
  * setup, but 'lax' keeps localhost workable without weakening production.
  */
-function baseOptions(isProduction: boolean, domain?: string): CookieOptions {
+function baseOptions(options: CookiePolicy): CookieOptions {
+  const { isProduction, domain, crossSite } = options;
+
   return {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? 'strict' : 'lax',
+    // SameSite=None is only honoured on a secure cookie, so cross-site forces
+    // Secure on regardless of environment.
+    secure: isProduction || crossSite,
+    sameSite: crossSite ? 'none' : isProduction ? 'strict' : 'lax',
     path: '/',
     ...(domain ? { domain } : {}),
   };
 }
 
+export interface CookiePolicy {
+  isProduction: boolean;
+  domain?: string;
+  /**
+   * True when the admin and the API sit on different registrable domains.
+   * See COOKIE_CROSS_SITE in the env schema for why this cannot be inferred.
+   */
+  crossSite: boolean;
+}
+
 export function setAuthCookies(
   response: Response,
   tokens: { accessToken: string; refreshToken: string },
-  options: {
-    isProduction: boolean;
-    domain?: string;
-    accessMaxAgeMs: number;
-    refreshMaxAgeMs: number;
-  },
+  options: CookiePolicy & { accessMaxAgeMs: number; refreshMaxAgeMs: number },
 ): void {
-  const base = baseOptions(options.isProduction, options.domain);
+  const base = baseOptions(options);
 
   response.cookie(ACCESS_TOKEN_COOKIE, tokens.accessToken, {
     ...base,
@@ -45,11 +54,9 @@ export function setAuthCookies(
   });
 }
 
-export function clearAuthCookies(
-  response: Response,
-  options: { isProduction: boolean; domain?: string },
-): void {
-  const base = baseOptions(options.isProduction, options.domain);
+export function clearAuthCookies(response: Response, options: CookiePolicy): void {
+  // Must match how the cookie was set, or the browser keeps it.
+  const base = baseOptions(options);
   response.clearCookie(ACCESS_TOKEN_COOKIE, base);
   response.clearCookie(REFRESH_TOKEN_COOKIE, base);
 }

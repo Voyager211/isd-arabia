@@ -65,6 +65,7 @@ export class AuthController {
     clearAuthCookies(response, {
       isProduction: this.config.isProduction,
       domain: this.config.jwt.cookieDomain,
+      crossSite: this.config.jwt.cookieCrossSite,
     });
     return { loggedOut: true };
   }
@@ -102,6 +103,7 @@ export class AuthController {
     setAuthCookies(response, tokens, {
       isProduction: this.config.isProduction,
       domain: this.config.jwt.cookieDomain,
+      crossSite: this.config.jwt.cookieCrossSite,
       accessMaxAgeMs: durationToMs(this.config.jwt.accessExpiry),
       refreshMaxAgeMs: durationToMs(this.config.jwt.refreshExpiry),
     });

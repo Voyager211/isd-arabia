@@ -58,6 +58,7 @@ export class AppConfigService {
       refreshExpiry: this.get('JWT_REFRESH_EXPIRY') as TokenDuration,
       bcryptRounds: this.get('BCRYPT_ROUNDS'),
       cookieDomain: this.get('COOKIE_DOMAIN'),
+      cookieCrossSite: this.get('COOKIE_CROSS_SITE'),
     };
   }
 
