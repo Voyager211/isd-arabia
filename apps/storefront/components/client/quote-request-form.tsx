@@ -7,10 +7,11 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertTriangle, Loader2 } from 'lucide-react';
-import { z } from 'zod';
 
 import type { QuotationItemRejection, SubmitQuotationResponse } from '@isd/shared-types';
 import { SAUDI_REGIONS } from '@isd/shared-types';
+
+import { quoteRequestSchema, type QuoteRequestValues } from '@/lib/validation/quote-request.schema';
 
 import { t } from '@/lib/i18n/en';
 import { api, normaliseError } from '@/lib/api/client';
@@ -20,29 +21,10 @@ import { cloudinaryUrl, PLACEHOLDER_IMAGE } from '@/lib/cloudinary';
 /**
  * Quotation request form (PROJECT_PLAN.md §9.9).
  *
- * The Zod schema mirrors the server DTO field for field. The server stays the
- * authority — this only saves a round trip and gives inline errors.
+ * The validation rules live in `lib/validation/quote-request.schema.ts` so
+ * they can be tested without rendering anything (§15.4).
  */
-const schema = z.object({
-  name: z.string().min(2, 'Enter your full name.').max(120),
-  designation: z.string().max(120).optional(),
-  company: z.string().min(2, 'Enter your company name.').max(160),
-  email: z.string().min(1, 'Enter your work email.').email('Enter a valid email address.'),
-  phone: z.string().min(6, 'Enter a contact phone number.').max(40),
-
-  line1: z.string().min(3, 'Enter the delivery address.').max(200),
-  line2: z.string().max(200).optional(),
-  city: z.string().min(2, 'Enter a city.').max(120),
-  region: z.enum(SAUDI_REGIONS, { message: 'Choose a region.' }),
-  postalCode: z.string().max(20).optional(),
-
-  message: z.string().max(4000).optional(),
-  consent: z.literal(true, { message: 'Please confirm we may contact you.' }),
-  /** Honeypot. Hidden from sighted users; a real visitor never fills it. */
-  website: z.string().max(0).optional(),
-});
-
-type FormValues = z.input<typeof schema>;
+type FormValues = QuoteRequestValues;
 
 export function QuoteRequestForm() {
   const router = useRouter();
@@ -56,7 +38,7 @@ export function QuoteRequestForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(quoteRequestSchema),
     defaultValues: { region: 'Eastern Province' },
   });
 

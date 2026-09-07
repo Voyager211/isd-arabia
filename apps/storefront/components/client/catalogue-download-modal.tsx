@@ -5,13 +5,16 @@ import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CheckCircle2, Download, FileText, Loader2, X } from 'lucide-react';
-import { z } from 'zod';
 
 import type { CatalogueDownloadResponse, CataloguePublic } from '@isd/shared-types';
 
 import { t } from '@/lib/i18n/en';
 import { api, normaliseError } from '@/lib/api/client';
 import { cloudinaryUrl } from '@/lib/cloudinary';
+import {
+  catalogueLeadSchema,
+  type CatalogueLeadValues,
+} from '@/lib/validation/quote-request.schema';
 
 /**
  * Lead-capture modal (PROJECT_PLAN.md §9.7).
@@ -26,17 +29,7 @@ import { cloudinaryUrl } from '@/lib/cloudinary';
  * completed form is the worst possible outcome for a lead that just converted.
  */
 
-const schema = z.object({
-  name: z.string().min(2, 'Enter your full name.').max(120),
-  company: z.string().min(2, 'Enter your company name.').max(160),
-  email: z.string().min(1, 'Enter your work email.').email('Enter a valid email address.'),
-  phone: z.string().min(6, 'Enter a contact phone number.').max(40),
-  consent: z.literal(true, { message: 'Please confirm we may contact you.' }),
-  /** Honeypot. */
-  website: z.string().max(0).optional(),
-});
-
-type FormValues = z.input<typeof schema>;
+type FormValues = CatalogueLeadValues;
 
 export function CatalogueDownloadModal({
   catalogue,
@@ -54,7 +47,7 @@ export function CatalogueDownloadModal({
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<FormValues>({ resolver: zodResolver(schema) });
+  } = useForm<FormValues>({ resolver: zodResolver(catalogueLeadSchema) });
 
   // Focus trap and restoration, per the accessibility floor (§5.5).
   useEffect(() => {
