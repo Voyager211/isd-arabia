@@ -22,10 +22,11 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,json,css,md}\"",
     "seed": "npm run build:types && npm run seed --workspace @isd/api",
     "build:types": "npm run build --workspace @isd/shared-types",
-    "dev": "npm run build:types && concurrently --names \"api,web,admin\" --prefix-colors \"blue,green,magenta\" --kill-others-on-fail \"npm:dev:api:only\" \"npm:dev:storefront:only\" \"npm:dev:admin:only\"",
+    "dev": "node scripts/check-ports.mjs && npm run build:types && concurrently --names \"api,web,admin\" --prefix-colors \"blue,green,magenta\" --kill-others-on-fail \"npm:dev:api:only\" \"npm:dev:storefront:only\" \"npm:dev:admin:only\"",
     "dev:api:only": "npm run dev --workspace @isd/api",
     "dev:storefront:only": "npm run dev --workspace @isd/storefront",
-    "dev:admin:only": "npm run dev --workspace @isd/admin"
+    "dev:admin:only": "npm run dev --workspace @isd/admin",
+    "check:ports": "node scripts/check-ports.mjs"
   },
   "devDependencies": {
     "concurrently": "^10.0.5",

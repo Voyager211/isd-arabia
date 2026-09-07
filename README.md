@@ -80,14 +80,18 @@ is reachable.
 Both frontend origins must appear in the API's `STOREFRONT_ORIGIN` and
 `ADMIN_ORIGIN`, or the browser will block every request as a CORS failure.
 
-**If a port is already taken**, Next.js quietly moves to 3001 and two dev
-servers then fight over the same `.next` directory, which fails with
-`Expected clientReferenceManifest to be defined`. Free the port rather than
-letting it fall back:
+**The three ports are fixed deliberately.** `npm run dev` refuses to start if
+any is taken, naming the port and the PID holding it — because a fallback port
+breaks things in ways that are hard to trace: the API allowlists only
+`localhost:3000` and `localhost:5173` for CORS, canonical URLs come from
+`NEXT_PUBLIC_SITE_URL`, and two Next.js dev servers sharing one `.next`
+directory corrupt it (surfacing as the unhelpful
+`Expected clientReferenceManifest to be defined`).
 
 ```bash
-npx kill-port 3000 4000 5173     # or find the PID with: netstat -ano | findstr :3000
-rm -rf apps/storefront/.next     # only if it has already gone wrong
+npm run check:ports              # what is holding them
+npx kill-port 3000 4000 5173     # free them
+rm -rf apps/storefront/.next     # only if .next has already been corrupted
 ```
 
 ### Seeding
