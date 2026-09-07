@@ -69,6 +69,17 @@ Idempotent — every write is an upsert keyed on slug or email, and existing
 records keep their edits. The client owns this data through the admin UI from
 day one, so a second run must never overwrite their work.
 
+Demo products are opt-in and refused in production:
+
+```bash
+npm run seed:demo --workspace @isd/api            # 1,500 by default
+npm run seed:demo --workspace @isd/api -- --count=5000
+```
+
+They give the client something to click through before any real data exists,
+and provide the volume the facet performance suite needs. The command prints
+how to remove them again.
+
 The seeded credential is `superadmin@example.com` / `@Password123` with
 `mustChangePassword` set. It is refused outright in production, where
 `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` are required.
@@ -145,10 +156,12 @@ sequence on every push.
 - **Lighthouse and the responsive/a11y sweep.** Both need the app running
   against real data. The targets in `PROJECT_PLAN.md` §15.1 have not been
   measured — the code was written to them, which is not the same thing.
-- **Facet performance at catalogue scale** (§17.1 risk 4). The `$facet`
-  aggregation is verified correct against fixtures and the listing query is
-  verified index-backed via `explain()`, but neither has been run against
-  1,000+ products. Do this before Phase 7, not during.
+- **Facet performance on Atlas M0** (§17.1 risk 4). `facet-performance.e2e-spec.ts`
+  now runs the aggregation against 1,200 products and checks correctness at
+  volume, index coverage and the examined-to-returned ratio. What it cannot
+  check is the §15.1 latency target: it runs against an in-memory mongod with
+  no network hop and no noisy neighbours, whereas M0 is shared CPU on a remote
+  host. Re-measure against staging.
 - **Brand colours.** `packages/design-tokens/tokens.css` still holds the
   placeholder direction from §5.1. Sampling and confirming them is a
   five-minute change that re-themes everything.

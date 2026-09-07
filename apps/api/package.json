@@ -8,7 +8,7 @@
     "dev": "nest start --watch",
     "start": "node dist/main",
     "start:debug": "nest start --debug --watch",
-    "lint": "eslint \"src/**/*.ts\"",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -16,7 +16,8 @@
     "seed": "ts-node -r tsconfig-paths/register src/database/seeds/seed.ts",
     "seed:admin": "ts-node -r tsconfig-paths/register src/database/seeds/seed.ts --only=admin",
     "seed:taxonomy": "ts-node -r tsconfig-paths/register src/database/seeds/seed.ts --only=taxonomy",
-    "test:all": "jest && jest --config ./test/jest-e2e.js --runInBand"
+    "test:all": "jest && jest --config ./test/jest-e2e.js --runInBand",
+    "seed:demo": "ts-node -r tsconfig-paths/register src/database/seeds/seed.ts --only=demo"
   },
   "dependencies": {
     "@isd/shared-types": "*",

@@ -7,7 +7,9 @@ import { AdminUser, AdminUserSchema } from '@/modules/auth/admin-user.schema';
 import { Brand, BrandSchema } from '@/modules/brands/brand.schema';
 import { Category, CategorySchema } from '@/modules/categories/category.schema';
 import { Industry, IndustrySchema } from '@/modules/industries/industry.schema';
+import { Product, ProductSchema } from '@/modules/products/product.schema';
 import { toSlug } from '@/common/utils/slug.util';
+import { generateProducts } from './demo-products.data';
 import {
   SEED_BRANDS,
   SEED_CATEGORY_TREE,
@@ -35,12 +37,23 @@ const DEFAULT_ADMIN = {
   name: 'Super Admin',
 };
 
-type Section = 'admin' | 'taxonomy';
+type Section = 'admin' | 'taxonomy' | 'demo';
+
+const SECTIONS: Section[] = ['admin', 'taxonomy', 'demo'];
+
+/** Demo products are opt-in — a plain `npm run seed` never creates them. */
+const DEFAULT_SECTIONS: Section[] = ['admin', 'taxonomy'];
 
 function parseSections(argv: string[]): Section[] {
   const only = argv.find((arg) => arg.startsWith('--only='))?.split('=')[1];
-  if (!only) return ['admin', 'taxonomy'];
-  return only.split(',').filter((s): s is Section => s === 'admin' || s === 'taxonomy');
+  if (!only) return DEFAULT_SECTIONS;
+  return only.split(',').filter((value): value is Section => SECTIONS.includes(value as Section));
+}
+
+function parseCount(argv: string[]): number {
+  const raw = argv.find((arg) => arg.startsWith('--count='))?.split('=')[1];
+  const parsed = Number.parseInt(raw ?? '', 10);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 20_000) : 1500;
 }
 
 async function seedAdmin(model: Model<AdminUser>, env: ReturnType<typeof validateEnv>) {
@@ -187,9 +200,103 @@ async function seedTaxonomy(
   console.log(`  · industries: ${SEED_INDUSTRIES.length}`);
 }
 
+/**
+ * Generates demo products spread across the leaf categories.
+ *
+ * Refused in production outright: this is throwaway data for evaluating the
+ * UI and for verifying facet performance at catalogue scale, and there is no
+ * good reason for it to exist in a live database. Every generated record is
+ * tagged so it can be found and removed again.
+ */
+async function seedDemoProducts(
+  productModel: Model<Product>,
+  categoryModel: Model<Category>,
+  brandModel: Model<Brand>,
+  industryModel: Model<Industry>,
+  env: ReturnType<typeof validateEnv>,
+  count: number,
+) {
+  if (env.NODE_ENV === 'production') {
+    throw new Error('Refusing to seed demo products in production.');
+  }
+
+  const [categories, brands, industries] = await Promise.all([
+    categoryModel.find({ isDeleted: false }).select('_id slug ancestors').lean().exec(),
+    brandModel.find({ isDeleted: false }).select('_id').lean().exec(),
+    industryModel.find({ isDeleted: false }).select('_id').lean().exec(),
+  ]);
+
+  // Products hang off leaves only, so the parents are filtered out here rather
+  // than being rejected one at a time by the service.
+  const parentIds = new Set(
+    categories.flatMap((category) => category.ancestors.map((id) => String(id))),
+  );
+  const leaves = categories.filter((category) => !parentIds.has(String(category._id)));
+
+  if (!leaves.length) {
+    console.log('  · no leaf categories found — run the taxonomy seed first');
+    return;
+  }
+
+  const perCategory = Math.max(1, Math.ceil(count / leaves.length));
+  const documents: Record<string, unknown>[] = [];
+
+  leaves.forEach((category, categoryIndex) => {
+    const generated = generateProducts(category.slug, perCategory, categoryIndex + 1);
+
+    generated.forEach((product, index) => {
+      const slug = `${toSlug(product.name)}-${product.sku.toLowerCase()}`;
+
+      documents.push({
+        ...product,
+        slug,
+        category: category._id,
+        categoryPath: [...category.ancestors, category._id],
+        // Spread across brands and industries so the facet counts under test
+        // are non-trivial rather than all landing in one bucket.
+        brand: brands.length ? brands[(categoryIndex + index) % brands.length]._id : null,
+        industries: industries.length
+          ? [industries[(categoryIndex + index) % industries.length]._id]
+          : [],
+        images: [],
+        documents: [],
+        isActive: true,
+        displayOrder: index,
+        isDeleted: false,
+      });
+    });
+  });
+
+  const toInsert = documents.slice(0, count);
+
+  // Batched: a single 20,000-document insertMany is a large payload for a
+  // free-tier connection and fails as one all-or-nothing operation.
+  const BATCH = 500;
+  let inserted = 0;
+
+  for (let offset = 0; offset < toInsert.length; offset += BATCH) {
+    const batch = toInsert.slice(offset, offset + BATCH);
+    // ordered: false so a single duplicate slug from a re-run does not abort
+    // the whole batch.
+    const result = await productModel
+      .insertMany(batch, { ordered: false })
+      .catch((error: { insertedDocs?: unknown[] }) => error.insertedDocs ?? []);
+    inserted += Array.isArray(result) ? result.length : 0;
+  }
+
+  console.log(`  · demo products: ${inserted} inserted across ${leaves.length} categories`);
+  // String.raw so the regex prints literally. In a normal string literal the
+  // backslashes are swallowed and the command the client pastes into mongosh
+  // matches nothing.
+  console.log(
+    String.raw`  · remove them again with: db.products.deleteMany({ sku: /^[A-Z]+-\d{3}-\d{4}$/ })`,
+  );
+}
+
 async function main() {
   const env = validateEnv(process.env);
   const sections = parseSections(process.argv.slice(2));
+  const demoCount = parseCount(process.argv.slice(2));
 
   console.log(`Seeding '${env.MONGODB_DB_NAME}' [${env.NODE_ENV}] — ${sections.join(', ')}`);
 
@@ -203,6 +310,7 @@ async function main() {
     const categoryModel = mongoose.model(Category.name, CategorySchema);
     const brandModel = mongoose.model(Brand.name, BrandSchema);
     const industryModel = mongoose.model(Industry.name, IndustrySchema);
+    const productModel = mongoose.model(Product.name, ProductSchema);
 
     if (sections.includes('admin')) {
       console.log('Admin:');
@@ -212,6 +320,18 @@ async function main() {
     if (sections.includes('taxonomy')) {
       console.log('Taxonomy:');
       await seedTaxonomy(categoryModel, brandModel, industryModel);
+    }
+
+    if (sections.includes('demo')) {
+      console.log(`Demo products (${demoCount}):`);
+      await seedDemoProducts(
+        productModel,
+        categoryModel,
+        brandModel,
+        industryModel,
+        env,
+        demoCount,
+      );
     }
 
     console.log('Seed complete.');
