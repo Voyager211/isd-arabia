@@ -15,6 +15,19 @@ import {
  * criterion #29.
  */
 
+/**
+ * Removes a trailing slash.
+ *
+ * People paste URLs from the address bar, which renders them as
+ * `https://example.com/`. The browser's `Origin` header never carries one, and
+ * the CORS comparison is an exact string match — so an unstripped slash
+ * validates cleanly, looks right in the dashboard, and silently matches
+ * nothing.
+ */
+function stripTrailingSlash(value: string): string {
+  return value.replace(/\/+$/, '');
+}
+
 const csv = z
   .string()
   .transform((value) =>
@@ -23,9 +36,31 @@ const csv = z
       .map((entry) => entry.trim())
       .filter(Boolean),
   )
-  .pipe(z.array(z.string().url()));
+  .pipe(z.array(z.string().url().transform(stripTrailingSlash)));
 
 const bool = z.enum(['true', 'false']).transform((value) => value === 'true');
+
+/**
+ * A browser origin: scheme + host + optional port, and nothing else.
+ *
+ * The trailing slash is stripped because that is how people paste URLs — the
+ * address bar shows "https://example.com/" — and the `Origin` header never has
+ * one. Without this the value passes `.url()` validation, looks correct in the
+ * dashboard, and then matches no request at all: every call is blocked by CORS
+ * with no error on the server side to explain it.
+ */
+const origin = z
+  .string()
+  .url()
+  .transform(stripTrailingSlash)
+  .refine((value) => {
+    try {
+      const parsed = new URL(value);
+      return `${parsed.protocol}//${parsed.host}` === value;
+    } catch {
+      return false;
+    }
+  }, 'Must be a bare origin — scheme, host and optional port, with no path or query.');
 
 export const envSchema = z
   .object({
@@ -79,8 +114,8 @@ export const envSchema = z
     CLOUDINARY_URL: z.string().optional(),
 
     // ── CORS (never '*' with credentials) ───────────────────────────────
-    STOREFRONT_ORIGIN: z.string().url(),
-    ADMIN_ORIGIN: z.string().url(),
+    STOREFRONT_ORIGIN: origin,
+    ADMIN_ORIGIN: origin,
     EXTRA_CORS_ORIGINS: csv.optional(),
 
     // ── On-demand revalidation (PROJECT_PLAN.md §4.2) ───────────────────
@@ -103,6 +138,20 @@ export const envSchema = z
     MAIL_FROM: z.string().optional(),
     QUOTATION_NOTIFY_TO: z.string().optional(),
     QUOTATION_NOTIFY_ENABLED: bool.default('true'),
+
+    /**
+     * Serves the interactive Swagger UI at `${API_PREFIX}/docs`.
+     *
+     * On outside production. Off in production by default, because an
+     * always-on schema browser is a map of the attack surface — it enumerates
+     * every admin route, parameter and validation rule for anyone who asks
+     * (PROJECT_PLAN.md §3.3).
+     *
+     * The committed docs/openapi.json is the answer for people who need the
+     * contract without the live endpoint. Set this true only if you genuinely
+     * want the UI public.
+     */
+    SWAGGER_ENABLED: bool.optional(),
 
     // ── Spam ────────────────────────────────────────────────────────────
     TURNSTILE_SECRET_KEY: z.string().min(1),

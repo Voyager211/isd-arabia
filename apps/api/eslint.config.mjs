@@ -3,7 +3,16 @@ import tseslint from 'typescript-eslint';
 import globals from 'globals';
 
 export default tseslint.config(
-  { ignores: ['dist', 'coverage', 'node_modules', 'eslint.config.mjs', 'jest.config.js', 'test/jest-e2e.js'] },
+  {
+    ignores: [
+      'dist',
+      'coverage',
+      'node_modules',
+      'eslint.config.mjs',
+      'jest.config.js',
+      'test/jest-e2e.js',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   {

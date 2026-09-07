@@ -136,6 +136,38 @@ API end-to-end tests need a downloaded mongod binary and run separately:
 npm run test:e2e --workspace @isd/api
 ```
 
+## Live
+
+| App        | URL                                               |
+| ---------- | ------------------------------------------------- |
+| Storefront | https://isd-arabia-storefront.vercel.app          |
+| Admin      | https://isd-arabia-admin.vercel.app               |
+| API        | https://isd-arabia-api.onrender.com/api/v1        |
+| Health     | https://isd-arabia-api.onrender.com/api/v1/health |
+
+The API sleeps after 15 minutes idle on Render's free tier, so the first
+request after a quiet spell takes 30–50 seconds. That is a cold start, not a
+failure — point UptimeRobot at the health endpoint every 5 minutes to keep it
+warm.
+
+## API documentation
+
+- **[docs/API_CONTRACT.md](docs/API_CONTRACT.md)** — every endpoint, generated
+  from the route metadata so it cannot drift from the code
+- **[docs/openapi.json](docs/openapi.json)** — the spec, importable into
+  Postman, Insomnia or a client generator
+- **Swagger UI** at http://localhost:4000/api/v1/docs when running locally
+
+Regenerate after changing any route:
+
+```bash
+npm run docs:api --workspace @isd/api
+```
+
+Swagger UI is **off in production** by default: an always-on schema browser
+enumerates every admin route, parameter and validation rule for anyone who asks
+(PROJECT_PLAN.md §3.3). Set `SWAGGER_ENABLED=true` to serve it anyway.
+
 ## Deployment
 
 | App        | Host                     | Notes                                     |

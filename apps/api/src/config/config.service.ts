@@ -26,6 +26,11 @@ export class AppConfigService {
     return this.nodeEnv === 'production';
   }
 
+  /** Defaults to on outside production, off within it. */
+  get swaggerEnabled(): boolean {
+    return this.get('SWAGGER_ENABLED') ?? !this.isProduction;
+  }
+
   get isDevelopment(): boolean {
     return this.nodeEnv === 'development';
   }

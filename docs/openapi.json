@@ -1,0 +1,2735 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/admin/uploads/signature": {
+      "post": {
+        "operationId": "UploadsController_signature",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadSignatureDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Signed params for a direct-to-Cloudinary upload",
+        "tags": [
+          "Admin — uploads"
+        ]
+      }
+    },
+    "/admin/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Sign in and receive httpOnly auth cookies",
+        "tags": [
+          "Admin — auth"
+        ]
+      }
+    },
+    "/admin/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refresh",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Rotate the refresh token and reissue the pair",
+        "tags": [
+          "Admin — auth"
+        ]
+      }
+    },
+    "/admin/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Invalidate the refresh token and clear cookies",
+        "tags": [
+          "Admin — auth"
+        ]
+      }
+    },
+    "/admin/auth/me": {
+      "get": {
+        "operationId": "AuthController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Current admin profile",
+        "tags": [
+          "Admin — auth"
+        ]
+      }
+    },
+    "/admin/auth/change-password": {
+      "post": {
+        "operationId": "AuthController_changePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Change password (required on first sign-in)",
+        "tags": [
+          "Admin — auth"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Liveness probe for UptimeRobot",
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/categories": {
+      "get": {
+        "operationId": "CategoryController_list",
+        "parameters": [
+          {
+            "name": "flat",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Full category tree, or a flat list with ?flat=true",
+        "tags": [
+          "Catalogue — categories"
+        ]
+      }
+    },
+    "/categories/menu": {
+      "get": {
+        "operationId": "CategoryController_menu",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Mega-menu tree, trimmed to what the panel renders",
+        "tags": [
+          "Catalogue — categories"
+        ]
+      }
+    },
+    "/categories/{slug}": {
+      "get": {
+        "operationId": "CategoryController_findOne",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Single category with its breadcrumb trail",
+        "tags": [
+          "Catalogue — categories"
+        ]
+      }
+    },
+    "/admin/categories": {
+      "get": {
+        "operationId": "CategoryAdminController_list",
+        "parameters": [
+          {
+            "name": "flat",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Full tree including inactive categories",
+        "tags": [
+          "Admin — categories"
+        ]
+      },
+      "post": {
+        "operationId": "CategoryAdminController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Create a category",
+        "tags": [
+          "Admin — categories"
+        ]
+      }
+    },
+    "/admin/categories/reorder": {
+      "patch": {
+        "operationId": "CategoryAdminController_reorder",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderCategoriesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Bulk displayOrder update",
+        "tags": [
+          "Admin — categories"
+        ]
+      }
+    },
+    "/admin/categories/{id}": {
+      "get": {
+        "operationId": "CategoryAdminController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Single category for the edit form",
+        "tags": [
+          "Admin — categories"
+        ]
+      },
+      "patch": {
+        "operationId": "CategoryAdminController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Update a category",
+        "tags": [
+          "Admin — categories"
+        ]
+      },
+      "delete": {
+        "operationId": "CategoryAdminController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Soft delete — blocked when children or products remain",
+        "tags": [
+          "Admin — categories"
+        ]
+      }
+    },
+    "/brands": {
+      "get": {
+        "operationId": "BrandController_list",
+        "parameters": [
+          {
+            "name": "active",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Active brands, ordered for the brand strip",
+        "tags": [
+          "Catalogue — brands"
+        ]
+      }
+    },
+    "/brands/{slug}": {
+      "get": {
+        "operationId": "BrandController_findOne",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Single brand",
+        "tags": [
+          "Catalogue — brands"
+        ]
+      }
+    },
+    "/admin/brands": {
+      "get": {
+        "operationId": "BrandAdminController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "All brands including inactive",
+        "tags": [
+          "Admin — brands"
+        ]
+      },
+      "post": {
+        "operationId": "BrandAdminController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBrandDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Admin — brands"
+        ]
+      }
+    },
+    "/admin/brands/{id}": {
+      "get": {
+        "operationId": "BrandAdminController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Admin — brands"
+        ]
+      },
+      "patch": {
+        "operationId": "BrandAdminController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBrandDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Admin — brands"
+        ]
+      },
+      "delete": {
+        "operationId": "BrandAdminController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Soft delete — blocked while products reference it",
+        "tags": [
+          "Admin — brands"
+        ]
+      }
+    },
+    "/industries": {
+      "get": {
+        "operationId": "IndustryController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Active industries",
+        "tags": [
+          "Catalogue — industries"
+        ]
+      }
+    },
+    "/industries/{slug}": {
+      "get": {
+        "operationId": "IndustryController_findOne",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Single industry with its long-form content",
+        "tags": [
+          "Catalogue — industries"
+        ]
+      }
+    },
+    "/admin/industries": {
+      "get": {
+        "operationId": "IndustryAdminController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Admin — industries"
+        ]
+      },
+      "post": {
+        "operationId": "IndustryAdminController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIndustryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Admin — industries"
+        ]
+      }
+    },
+    "/admin/industries/{id}": {
+      "get": {
+        "operationId": "IndustryAdminController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Admin — industries"
+        ]
+      },
+      "patch": {
+        "operationId": "IndustryAdminController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateIndustryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Admin — industries"
+        ]
+      },
+      "delete": {
+        "operationId": "IndustryAdminController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Soft delete — blocked while products reference it",
+        "tags": [
+          "Admin — industries"
+        ]
+      }
+    },
+    "/products": {
+      "get": {
+        "operationId": "ProductController_list",
+        "parameters": [
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Category slug(s); repeated or comma-separated",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "brand",
+            "required": false,
+            "in": "query",
+            "description": "Brand slug(s)",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "industry",
+            "required": false,
+            "in": "query",
+            "description": "Industry slug(s)",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Full-text search across name, SKU and short description",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "featured",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "newArrival",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "newest",
+                "oldest",
+                "name_asc",
+                "name_desc",
+                "relevance"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 60,
+              "default": 24,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "inactive",
+                "all"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Product listing with facet counts",
+        "tags": [
+          "Catalogue — products"
+        ]
+      }
+    },
+    "/products/slugs": {
+      "get": {
+        "operationId": "ProductController_slugs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "All active slugs, for generateStaticParams and the sitemap",
+        "tags": [
+          "Catalogue — products"
+        ]
+      }
+    },
+    "/products/{slug}": {
+      "get": {
+        "operationId": "ProductController_findOne",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Single product with category, brand and industries resolved",
+        "tags": [
+          "Catalogue — products"
+        ]
+      }
+    },
+    "/products/{slug}/related": {
+      "get": {
+        "operationId": "ProductController_related",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Eight products from the same category",
+        "tags": [
+          "Catalogue — products"
+        ]
+      }
+    },
+    "/admin/products": {
+      "get": {
+        "operationId": "ProductAdminController_list",
+        "parameters": [
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Category slug(s); repeated or comma-separated",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "brand",
+            "required": false,
+            "in": "query",
+            "description": "Brand slug(s)",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "industry",
+            "required": false,
+            "in": "query",
+            "description": "Industry slug(s)",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Full-text search across name, SKU and short description",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "featured",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "newArrival",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "newest",
+                "oldest",
+                "name_asc",
+                "name_desc",
+                "relevance"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 60,
+              "default": 24,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "inactive",
+                "all"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Paginated product list, filterable by category, brand and status",
+        "tags": [
+          "Admin — products"
+        ]
+      },
+      "post": {
+        "operationId": "ProductAdminController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Admin — products"
+        ]
+      }
+    },
+    "/admin/products/{id}": {
+      "get": {
+        "operationId": "ProductAdminController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Full record for the edit form",
+        "tags": [
+          "Admin — products"
+        ]
+      },
+      "patch": {
+        "operationId": "ProductAdminController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Admin — products"
+        ]
+      },
+      "delete": {
+        "operationId": "ProductAdminController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Soft delete — Cloudinary assets are kept, the action is reversible",
+        "tags": [
+          "Admin — products"
+        ]
+      }
+    },
+    "/admin/products/{id}/images/reorder": {
+      "patch": {
+        "operationId": "ProductAdminController_reorderImages",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderImagesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Reorder images; index 0 becomes the primary",
+        "tags": [
+          "Admin — products"
+        ]
+      }
+    },
+    "/admin/products/{id}/images/{publicId}": {
+      "delete": {
+        "operationId": "ProductAdminController_removeImage",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "publicId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Remove an image and destroy it in Cloudinary — permanent",
+        "tags": [
+          "Admin — products"
+        ]
+      }
+    },
+    "/search/suggest": {
+      "get": {
+        "operationId": "SearchController_suggest",
+        "parameters": [
+          {
+            "name": "q",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Typeahead suggestions, max 8",
+        "tags": [
+          "Catalogue — search"
+        ]
+      }
+    },
+    "/quotations": {
+      "post": {
+        "operationId": "QuotationController_submit",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitQuotationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Submit a quotation request",
+        "tags": [
+          "Quotations"
+        ]
+      }
+    },
+    "/admin/quotations": {
+      "get": {
+        "operationId": "QuotationAdminController_list",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "new",
+                  "in_review",
+                  "quoted",
+                  "won",
+                  "lost",
+                  "cancelled"
+                ]
+              }
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Quote number, company, contact name or email",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "ISO date, inclusive",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "ISO date, inclusive",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 25,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Paginated quotations, filterable by status, date range and search",
+        "tags": [
+          "Admin — quotations"
+        ]
+      }
+    },
+    "/admin/quotations/export": {
+      "get": {
+        "operationId": "QuotationAdminController_export",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "new",
+                  "in_review",
+                  "quoted",
+                  "won",
+                  "lost",
+                  "cancelled"
+                ]
+              }
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Quote number, company, contact name or email",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "ISO date, inclusive",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "ISO date, inclusive",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 25,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "CSV of the filtered set",
+        "tags": [
+          "Admin — quotations"
+        ]
+      }
+    },
+    "/admin/quotations/{id}": {
+      "get": {
+        "operationId": "QuotationAdminController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Full quotation for the detail modal",
+        "tags": [
+          "Admin — quotations"
+        ]
+      },
+      "delete": {
+        "operationId": "QuotationAdminController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Soft delete — the record is kept and can be restored",
+        "tags": [
+          "Admin — quotations"
+        ]
+      }
+    },
+    "/admin/quotations/{id}/status": {
+      "patch": {
+        "operationId": "QuotationAdminController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuotationStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Change status; appends to statusHistory",
+        "tags": [
+          "Admin — quotations"
+        ]
+      }
+    },
+    "/admin/quotations/{id}/notes": {
+      "post": {
+        "operationId": "QuotationAdminController_addNote",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddQuotationNoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Add an internal note",
+        "tags": [
+          "Admin — quotations"
+        ]
+      }
+    },
+    "/catalogue/active": {
+      "get": {
+        "operationId": "CatalogueController_active",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Active catalogue metadata — no file URL when gated",
+        "tags": [
+          "Catalogue download"
+        ]
+      }
+    },
+    "/catalogue/download": {
+      "post": {
+        "operationId": "CatalogueController_download",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CatalogueDownloadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Submit the lead form and receive a time-limited download URL",
+        "tags": [
+          "Catalogue download"
+        ]
+      }
+    },
+    "/admin/catalogue": {
+      "get": {
+        "operationId": "CatalogueAdminController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "All catalogue files, active first",
+        "tags": [
+          "Admin — catalogue"
+        ]
+      },
+      "post": {
+        "operationId": "CatalogueAdminController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCatalogueFileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Register an uploaded catalogue PDF",
+        "tags": [
+          "Admin — catalogue"
+        ]
+      }
+    },
+    "/admin/catalogue/leads/export": {
+      "get": {
+        "operationId": "CatalogueAdminController_exportLeads",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Name, company or email",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 25,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "CSV of the filtered leads",
+        "tags": [
+          "Admin — catalogue"
+        ]
+      }
+    },
+    "/admin/catalogue/leads": {
+      "get": {
+        "operationId": "CatalogueAdminController_leads",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Name, company or email",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 25,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Paginated download leads",
+        "tags": [
+          "Admin — catalogue"
+        ]
+      }
+    },
+    "/admin/catalogue/{id}/activate": {
+      "patch": {
+        "operationId": "CatalogueAdminController_activate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Make this file active and deactivate the rest",
+        "tags": [
+          "Admin — catalogue"
+        ]
+      }
+    },
+    "/admin/catalogue/{id}": {
+      "patch": {
+        "operationId": "CatalogueAdminController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCatalogueFileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Update metadata; the PDF itself is replaced by a new record",
+        "tags": [
+          "Admin — catalogue"
+        ]
+      },
+      "delete": {
+        "operationId": "CatalogueAdminController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Soft delete — the Cloudinary asset is kept",
+        "tags": [
+          "Admin — catalogue"
+        ]
+      }
+    },
+    "/admin/dashboard/stats": {
+      "get": {
+        "operationId": "DashboardController_stats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Counts and recent activity for the admin dashboard",
+        "tags": [
+          "Admin — dashboard"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "ISD Arabia API",
+    "description": "B2B industrial catalogue with a quotation-based enquiry flow.\n\n**There is no pricing, checkout or payment surface anywhere in this API.**\nVisitors assemble a cart client-side and submit it as a quotation request;\nthe commercial conversation happens offline afterwards.\n\n### Response envelope\nEvery response has the same shape:\n```json\n{ \"success\": true,  \"data\": {}, \"meta\": {} }\n{ \"success\": false, \"error\": { \"code\": \"VALIDATION_ERROR\", \"message\": \"…\", \"details\": [] } }\n```\n\n### Authentication\nAdmin routes require a JWT delivered as an httpOnly cookie (`isd_at`),\nobtained from `POST /admin/auth/login`. Bearer tokens are accepted as a\nsecondary source so this page and integration tests remain usable.\n\nPublic catalogue and quotation routes need no authentication.",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "Catalogue — categories",
+      "description": "The three-level category tree and mega-menu"
+    },
+    {
+      "name": "Catalogue — brands",
+      "description": ""
+    },
+    {
+      "name": "Catalogue — industries",
+      "description": ""
+    },
+    {
+      "name": "Catalogue — products",
+      "description": "Listing with facet counts, detail, and related"
+    },
+    {
+      "name": "Catalogue — search",
+      "description": "Typeahead suggestions"
+    },
+    {
+      "name": "Quotations",
+      "description": "Public quotation submission"
+    },
+    {
+      "name": "Catalogue download",
+      "description": "Lead-gated catalogue PDF"
+    },
+    {
+      "name": "System",
+      "description": "Liveness probe"
+    },
+    {
+      "name": "Admin — auth",
+      "description": ""
+    },
+    {
+      "name": "Admin — categories",
+      "description": ""
+    },
+    {
+      "name": "Admin — brands",
+      "description": ""
+    },
+    {
+      "name": "Admin — industries",
+      "description": ""
+    },
+    {
+      "name": "Admin — products",
+      "description": ""
+    },
+    {
+      "name": "Admin — quotations",
+      "description": ""
+    },
+    {
+      "name": "Admin — catalogue",
+      "description": ""
+    },
+    {
+      "name": "Admin — uploads",
+      "description": "Signed direct-to-Cloudinary upload parameters"
+    },
+    {
+      "name": "Admin — dashboard",
+      "description": ""
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "cookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "isd_at"
+      },
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "UploadSignatureDto": {
+        "type": "object",
+        "properties": {
+          "folder": {
+            "type": "string",
+            "enum": [
+              "products",
+              "categories",
+              "brands",
+              "industries",
+              "banners",
+              "catalogue"
+            ]
+          },
+          "resourceType": {
+            "type": "string",
+            "enum": [
+              "image",
+              "raw"
+            ]
+          },
+          "productId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "folder",
+          "resourceType"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "superadmin@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "@Password123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string",
+            "minLength": 12
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      },
+      "CategoryOrderDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "displayOrder": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "displayOrder"
+        ]
+      },
+      "ReorderCategoriesDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryOrderDto"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "AssetRefDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "publicId": {
+            "type": "string",
+            "description": "Required — deletion needs it."
+          },
+          "alt": {
+            "type": "string",
+            "description": "Required on images; the admin uploader enforces it."
+          },
+          "width": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          },
+          "order": {
+            "type": "number",
+            "default": 0
+          }
+        },
+        "required": [
+          "url",
+          "publicId",
+          "alt"
+        ]
+      },
+      "SeoMetaDto": {
+        "type": "object",
+        "properties": {
+          "metaTitle": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "metaDescription": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "metaKeywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ogImage": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "image": {
+            "$ref": "#/components/schemas/AssetRefDto"
+          },
+          "banner": {
+            "$ref": "#/components/schemas/AssetRefDto"
+          },
+          "parent": {
+            "type": "object",
+            "nullable": true
+          },
+          "displayOrder": {
+            "type": "number",
+            "default": 0
+          },
+          "showInMenu": {
+            "type": "boolean",
+            "default": true
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          },
+          "seo": {
+            "$ref": "#/components/schemas/SeoMetaDto"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "image": {
+            "$ref": "#/components/schemas/AssetRefDto"
+          },
+          "banner": {
+            "$ref": "#/components/schemas/AssetRefDto"
+          },
+          "parent": {
+            "type": "object",
+            "nullable": true
+          },
+          "displayOrder": {
+            "type": "number",
+            "default": 0
+          },
+          "showInMenu": {
+            "type": "boolean",
+            "default": true
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          },
+          "seo": {
+            "$ref": "#/components/schemas/SeoMetaDto"
+          }
+        }
+      },
+      "CreateBrandDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "logo": {
+            "$ref": "#/components/schemas/AssetRefDto"
+          },
+          "banner": {
+            "$ref": "#/components/schemas/AssetRefDto"
+          },
+          "description": {
+            "type": "string"
+          },
+          "displayOrder": {
+            "type": "number",
+            "default": 0
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          },
+          "seo": {
+            "$ref": "#/components/schemas/SeoMetaDto"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateBrandDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "logo": {
+            "$ref": "#/components/schemas/AssetRefDto"
+          },
+          "banner": {
+            "$ref": "#/components/schemas/AssetRefDto"
+          },
+          "description": {
+            "type": "string"
+          },
+          "displayOrder": {
+            "type": "number",
+            "default": 0
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          },
+          "seo": {
+            "$ref": "#/components/schemas/SeoMetaDto"
+          }
+        }
+      },
+      "CreateIndustryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "icon": {
+            "$ref": "#/components/schemas/AssetRefDto"
+          },
+          "banner": {
+            "$ref": "#/components/schemas/AssetRefDto"
+          },
+          "description": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "displayOrder": {
+            "type": "number",
+            "default": 0
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          },
+          "seo": {
+            "$ref": "#/components/schemas/SeoMetaDto"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateIndustryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "icon": {
+            "$ref": "#/components/schemas/AssetRefDto"
+          },
+          "banner": {
+            "$ref": "#/components/schemas/AssetRefDto"
+          },
+          "description": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "displayOrder": {
+            "type": "number",
+            "default": 0
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          },
+          "seo": {
+            "$ref": "#/components/schemas/SeoMetaDto"
+          }
+        }
+      },
+      "Object": {
+        "type": "object",
+        "properties": {}
+      },
+      "SpecificationDto": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "value"
+        ]
+      },
+      "ProductAttachmentDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "publicId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "url",
+          "publicId"
+        ]
+      },
+      "CreateProductDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string",
+            "description": "Part number. Unique, stored uppercase."
+          },
+          "shortDescription": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "description": {
+            "type": "string"
+          },
+          "keyFeatures": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "specifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SpecificationDto"
+            }
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssetRefDto"
+            }
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductAttachmentDto"
+            }
+          },
+          "category": {
+            "type": "string",
+            "description": "Leaf category only — enforced by the service."
+          },
+          "brand": {
+            "type": "object",
+            "nullable": true
+          },
+          "industries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "piece",
+              "pack",
+              "box",
+              "roll",
+              "metre",
+              "kilogram",
+              "litre",
+              "set"
+            ]
+          },
+          "minOrderQuantity": {
+            "type": "number",
+            "default": 1
+          },
+          "availability": {
+            "type": "string",
+            "enum": [
+              "in_stock",
+              "made_to_order",
+              "on_request"
+            ]
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          },
+          "isFeatured": {
+            "type": "boolean",
+            "default": false
+          },
+          "isNewArrival": {
+            "type": "boolean",
+            "default": false
+          },
+          "displayOrder": {
+            "type": "number",
+            "default": 0
+          },
+          "seo": {
+            "$ref": "#/components/schemas/SeoMetaDto"
+          }
+        },
+        "required": [
+          "name",
+          "sku",
+          "category"
+        ]
+      },
+      "UpdateProductDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string",
+            "description": "Part number. Unique, stored uppercase."
+          },
+          "shortDescription": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "description": {
+            "type": "string"
+          },
+          "keyFeatures": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "specifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SpecificationDto"
+            }
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssetRefDto"
+            }
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductAttachmentDto"
+            }
+          },
+          "category": {
+            "type": "string",
+            "description": "Leaf category only — enforced by the service."
+          },
+          "brand": {
+            "type": "object",
+            "nullable": true
+          },
+          "industries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "piece",
+              "pack",
+              "box",
+              "roll",
+              "metre",
+              "kilogram",
+              "litre",
+              "set"
+            ]
+          },
+          "minOrderQuantity": {
+            "type": "number",
+            "default": 1
+          },
+          "availability": {
+            "type": "string",
+            "enum": [
+              "in_stock",
+              "made_to_order",
+              "on_request"
+            ]
+          },
+          "isActive": {
+            "type": "boolean",
+            "default": true
+          },
+          "isFeatured": {
+            "type": "boolean",
+            "default": false
+          },
+          "isNewArrival": {
+            "type": "boolean",
+            "default": false
+          },
+          "displayOrder": {
+            "type": "number",
+            "default": 0
+          },
+          "seo": {
+            "$ref": "#/components/schemas/SeoMetaDto"
+          }
+        }
+      },
+      "ReorderImagesDto": {
+        "type": "object",
+        "properties": {
+          "publicIds": {
+            "description": "Every publicId currently on the product, in the new order.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "publicIds"
+        ]
+      },
+      "SubmitQuotationCustomerDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "company": {
+            "type": "string"
+          },
+          "designation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "phone",
+          "company"
+        ]
+      },
+      "SubmitQuotationAddressDto": {
+        "type": "object",
+        "properties": {
+          "line1": {
+            "type": "string"
+          },
+          "line2": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string",
+            "enum": [
+              "Riyadh",
+              "Makkah",
+              "Madinah",
+              "Eastern Province",
+              "Asir",
+              "Tabuk",
+              "Hail",
+              "Northern Borders",
+              "Jazan",
+              "Najran",
+              "Al Bahah",
+              "Al Jawf",
+              "Qassim"
+            ]
+          },
+          "postalCode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string",
+            "default": "Saudi Arabia"
+          }
+        },
+        "required": [
+          "line1",
+          "city",
+          "region"
+        ]
+      },
+      "SubmitQuotationItemDto": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 1
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "productId",
+          "quantity"
+        ]
+      },
+      "SubmitQuotationDto": {
+        "type": "object",
+        "properties": {
+          "customer": {
+            "$ref": "#/components/schemas/SubmitQuotationCustomerDto"
+          },
+          "address": {
+            "$ref": "#/components/schemas/SubmitQuotationAddressDto"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubmitQuotationItemDto"
+            }
+          },
+          "message": {
+            "type": "string"
+          },
+          "turnstileToken": {
+            "type": "string"
+          },
+          "website": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "customer",
+          "address",
+          "items"
+        ]
+      },
+      "UpdateQuotationStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "new",
+              "in_review",
+              "quoted",
+              "won",
+              "lost",
+              "cancelled"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "description": "Recorded against the status change in the history."
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "AddQuotationNoteDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "note"
+        ]
+      },
+      "CatalogueDownloadDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "company": {
+            "type": "string"
+          },
+          "turnstileToken": {
+            "type": "string"
+          },
+          "website": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "phone",
+          "company"
+        ]
+      },
+      "CatalogueAssetDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "publicId": {
+            "type": "string",
+            "description": "Cloudinary public_id of the raw, authenticated resource."
+          },
+          "sizeBytes": {
+            "type": "number"
+          },
+          "pageCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "url",
+          "publicId",
+          "sizeBytes"
+        ]
+      },
+      "CreateCatalogueFileDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "file": {
+            "$ref": "#/components/schemas/CatalogueAssetDto"
+          },
+          "coverImage": {
+            "$ref": "#/components/schemas/AssetRefDto"
+          },
+          "version": {
+            "type": "string",
+            "example": "2026-Q1"
+          },
+          "requiresLead": {
+            "type": "boolean",
+            "default": true
+          },
+          "displayOrder": {
+            "type": "number",
+            "default": 0
+          }
+        },
+        "required": [
+          "title",
+          "file",
+          "version"
+        ]
+      },
+      "UpdateCatalogueFileDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "file": {
+            "$ref": "#/components/schemas/CatalogueAssetDto"
+          },
+          "coverImage": {
+            "$ref": "#/components/schemas/AssetRefDto"
+          },
+          "version": {
+            "type": "string",
+            "example": "2026-Q1"
+          },
+          "requiresLead": {
+            "type": "boolean",
+            "default": true
+          },
+          "displayOrder": {
+            "type": "number",
+            "default": 0
+          }
+        }
+      }
+    }
+  }
+}

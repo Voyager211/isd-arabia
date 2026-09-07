@@ -2,7 +2,7 @@ import 'reflect-metadata';
 
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SwaggerModule } from '@nestjs/swagger';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger } from 'nestjs-pino';
 import cookieParser from 'cookie-parser';
@@ -11,6 +11,7 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { AppConfigService } from './config/config.service';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { buildOpenApiDocument, SWAGGER_PATH } from './config/openapi';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -69,22 +70,15 @@ async function bootstrap(): Promise<void> {
 
   app.useGlobalFilters(new AllExceptionsFilter(config.isProduction));
 
-  // Swagger is a map of the attack surface; it does not ship to production.
-  if (!config.isProduction) {
-    const document = SwaggerModule.createDocument(
-      app,
-      new DocumentBuilder()
-        .setTitle('ISD Arabia API')
-        .setDescription(
-          'B2B industrial catalogue and quotation platform. Quotation-based enquiry flow — there is no pricing, checkout or payment surface.',
-        )
-        .setVersion('1.0')
-        .addCookieAuth('isd_at')
-        .addBearerAuth()
-        .build(),
-    );
-    SwaggerModule.setup(`${config.apiPrefix}/docs`, app, document, {
+  /**
+   * Swagger enumerates every route, parameter and validation rule — a map of
+   * the attack surface. Off in production unless SWAGGER_ENABLED says
+   * otherwise; docs/openapi.json is the committed alternative (§3.3).
+   */
+  if (config.swaggerEnabled) {
+    SwaggerModule.setup(`${config.apiPrefix}/${SWAGGER_PATH}`, app, buildOpenApiDocument(app), {
       swaggerOptions: { persistAuthorization: true },
+      customSiteTitle: 'ISD Arabia API',
     });
   }
 
