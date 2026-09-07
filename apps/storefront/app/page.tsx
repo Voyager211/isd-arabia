@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, PackageSearch, ShieldCheck, Truck } from 'lucide-react';
@@ -5,7 +6,7 @@ import { ArrowRight, PackageSearch, ShieldCheck, Truck } from 'lucide-react';
 import { t } from '@/lib/i18n/en';
 import { getActiveCatalogue, getBrands, getIndustries, getMenu } from '@/lib/api/catalogue';
 import { getProducts } from '@/lib/api/products';
-import { jsonLdScript, organizationJsonLd } from '@/lib/seo';
+import { buildMetadata, jsonLdScript, organizationJsonLd } from '@/lib/seo';
 import { cloudinaryUrl } from '@/lib/cloudinary';
 import { ProductCard } from '@/components/server/product-card';
 import { CatalogueDownloadButton } from '@/components/client/catalogue-download-button';
@@ -23,6 +24,24 @@ import { CatalogueDownloadButton } from '@/components/client/catalogue-download-
  * featured rail is a far better outcome than a 500.
  */
 export const revalidate = 3600;
+
+/**
+ * The home page needs its own metadata, not the layout's defaults.
+ *
+ * Inheriting them left it as the ONE page on the site with no canonical, which
+ * is the worst place to miss: it takes the most traffic and is the most likely
+ * to be shared carrying ?utm_source= or ?fbclid=, each of which becomes a
+ * separate indexable duplicate without one.
+ */
+export const metadata: Metadata = buildMetadata({
+  fallbackTitle: `${t.brand.name} — ${t.brand.tagline}`,
+  fallbackDescription:
+    'Industrial supplies distribution across Saudi Arabia — welding consumables, safety equipment, scaffolding tools and MRO supply. Browse the catalogue and request a quotation.',
+  path: '/',
+  // The title already carries the brand name; the layout template would
+  // render it twice.
+  absoluteTitle: true,
+});
 
 export default async function HomePage() {
   const [menu, catalogue, brands, industries, newArrivals, featured] = await Promise.all([

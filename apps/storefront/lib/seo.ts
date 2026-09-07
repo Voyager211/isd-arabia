@@ -33,6 +33,13 @@ export interface MetadataInput {
   imageUrl?: string | null;
   /** Cart, request and search pages must not be indexed. */
   noindex?: boolean;
+  /**
+   * Bypasses the root layout's `%s | ISD Arabia` title template.
+   *
+   * Only the home page wants this — its title already carries the brand name,
+   * and the template would render it twice.
+   */
+  absoluteTitle?: boolean;
 }
 
 export function buildMetadata({
@@ -42,6 +49,7 @@ export function buildMetadata({
   path,
   imageUrl,
   noindex = false,
+  absoluteTitle = false,
 }: MetadataInput): Metadata {
   const title = truncate(seo?.metaTitle || fallbackTitle, MAX_TITLE);
   const description = truncate(
@@ -52,11 +60,13 @@ export function buildMetadata({
   const image = seo?.ogImage || imageUrl || undefined;
 
   return {
-    title,
+    title: absoluteTitle ? { absolute: title } : title,
     description,
     keywords: seo?.metaKeywords?.length ? seo.metaKeywords : undefined,
     // A canonical on every page is what stops the filtered variants of a
-    // listing competing with the clean category URL.
+    // listing competing with the clean category URL — and, on the home page,
+    // what stops every ?utm_source= and ?fbclid= link becoming its own
+    // indexable duplicate.
     alternates: { canonical },
     robots: noindex ? { index: false, follow: true } : { index: true, follow: true },
     openGraph: {
