@@ -52,10 +52,42 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 
 ### Running
 
+All three at once, with prefixed output:
+
 ```bash
-npm run dev:api         # http://localhost:4000/api/v1  (docs at /api/v1/docs)
-npm run dev:storefront  # http://localhost:3000
-npm run dev:admin       # http://localhost:5173
+npm run dev
+```
+
+| App        | URL                               |
+| ---------- | --------------------------------- |
+| API        | http://localhost:4000/api/v1      |
+| Swagger    | http://localhost:4000/api/v1/docs |
+| Storefront | http://localhost:3000             |
+| Admin      | http://localhost:5173             |
+
+Or individually:
+
+```bash
+npm run dev:api
+npm run dev:storefront
+npm run dev:admin
+```
+
+Sign in to the admin with the seeded credential — `superadmin@example.com` /
+`@Password123` — and it will force a password change before any other screen
+is reachable.
+
+Both frontend origins must appear in the API's `STOREFRONT_ORIGIN` and
+`ADMIN_ORIGIN`, or the browser will block every request as a CORS failure.
+
+**If a port is already taken**, Next.js quietly moves to 3001 and two dev
+servers then fight over the same `.next` directory, which fails with
+`Expected clientReferenceManifest to be defined`. Free the port rather than
+letting it fall back:
+
+```bash
+npx kill-port 3000 4000 5173     # or find the PID with: netstat -ano | findstr :3000
+rm -rf apps/storefront/.next     # only if it has already gone wrong
 ```
 
 ### Seeding
