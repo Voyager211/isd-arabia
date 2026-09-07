@@ -33,6 +33,15 @@ import {
   toSlugArray,
 } from './product-filter.util';
 
+/** The one document a `$facet` stage produces, one key per branch. */
+interface FacetResult {
+  items: RawCard[];
+  total: { value: number }[];
+  categoryFacet: RawFacet[];
+  brandFacet: RawFacet[];
+  industryFacet: RawFacet[];
+}
+
 export interface ListResult {
   data: ProductCard[];
   meta: PaginationMeta & { facets: ProductFacets };
@@ -167,15 +176,15 @@ export class ProductService {
       },
     ];
 
-    const [result] = await this.productModel.aggregate(pipeline).exec();
+    const [result] = await this.productModel.aggregate<FacetResult>(pipeline).exec();
 
-    const total = (result?.total?.[0]?.value as number) ?? 0;
-    const items = (result?.items ?? []) as RawCard[];
+    const total = result?.total?.[0]?.value ?? 0;
+    const items = result?.items ?? [];
 
     const facets = await this.resolveFacetLabels({
-      categories: (result?.categoryFacet ?? []) as RawFacet[],
-      brands: (result?.brandFacet ?? []) as RawFacet[],
-      industries: (result?.industryFacet ?? []) as RawFacet[],
+      categories: result?.categoryFacet ?? [],
+      brands: result?.brandFacet ?? [],
+      industries: result?.industryFacet ?? [],
     });
 
     return {
@@ -254,7 +263,7 @@ export class ProductService {
       categoryPath: (product.categoryPath ?? []).map(String),
       createdAt: new Date(product.createdAt).toISOString(),
       updatedAt: new Date(product.updatedAt).toISOString(),
-    } as ProductPopulated;
+    };
   }
 
   /** Eight siblings from the same category, excluding the product itself. */
@@ -268,7 +277,7 @@ export class ProductService {
     if (!product) throw new NotFoundException(`No product found for '${slug}'.`);
 
     const related = await this.productModel
-      .aggregate([
+      .aggregate<RawCard>([
         {
           $match: {
             category: product.category,
@@ -297,7 +306,7 @@ export class ProductService {
       ])
       .exec();
 
-    return (related as RawCard[]).map(toCard);
+    return related.map(toCard);
   }
 
   /** Typeahead — capped at 8, name and SKU only (PROJECT_PLAN.md §9.6). */
@@ -316,7 +325,7 @@ export class ProductService {
      * index, and the result set is capped.
      */
     const results = await this.productModel
-      .aggregate([
+      .aggregate<RawCard>([
         {
           $match: {
             ...notDeleted(),
@@ -333,7 +342,7 @@ export class ProductService {
       ])
       .exec();
 
-    return (results as RawCard[]).map((product) => ({
+    return results.map((product) => ({
       name: product.name,
       slug: product.slug,
       sku: product.sku,
@@ -385,7 +394,7 @@ export class ProductService {
         .select('name slug sku images category brand isActive isFeatured isNewArrival updatedAt')
         .populate('category', 'name slug')
         .populate('brand', 'name slug')
-        .sort(buildProductSort(query.sort, hasText) as Record<string, 1 | -1>)
+        .sort(buildProductSort(query.sort, hasText))
         .skip(skip)
         .limit(limit)
         .lean()
@@ -409,7 +418,7 @@ export class ProductService {
       .exec();
 
     if (!product) throw new NotFoundException('Product not found.');
-    return product as unknown as Record<string, unknown>;
+    return product;
   }
 
   async create(dto: CreateProductDto): Promise<Record<string, unknown>> {

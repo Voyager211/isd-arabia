@@ -21,6 +21,13 @@ const STATUS_TO_CODE: Record<number, ApiErrorCode> = {
   [HttpStatus.TOO_MANY_REQUESTS]: 'RATE_LIMITED',
 };
 
+/**
+ * Anything at or above this is logged as an error with its stack; below it is
+ * a warning. Annotated `number` because `status` is a plain number, not a
+ * HttpStatus member.
+ */
+const SERVER_ERROR_FLOOR: number = HttpStatus.INTERNAL_SERVER_ERROR;
+
 interface NormalisedError {
   status: number;
   code: ApiErrorCode;
@@ -48,7 +55,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const normalised = this.normalise(exception);
 
-    if (normalised.status >= HttpStatus.INTERNAL_SERVER_ERROR) {
+    if (normalised.status >= SERVER_ERROR_FLOOR) {
       this.logger.error(
         `${request.method} ${request.originalUrl} → ${normalised.status}`,
         exception instanceof Error ? exception.stack : String(exception),
@@ -158,7 +165,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       typeof exception === 'object' &&
       exception !== null &&
       'code' in exception &&
-      (exception as { code: unknown }).code === 11000
+      exception.code === 11000
     );
   }
 }

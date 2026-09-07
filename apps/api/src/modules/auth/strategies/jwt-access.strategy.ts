@@ -3,6 +3,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import type { Request } from 'express';
 
+import { readCookie } from '../auth.cookies';
+
 import { AppConfigService } from '@/config/config.service';
 import type { AuthenticatedAdmin } from '../decorators/current-user.decorator';
 import { ACCESS_TOKEN_COOKIE } from '../auth.cookies';
@@ -21,7 +23,7 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt-access') 
   constructor(config: AppConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: Request) => request?.cookies?.[ACCESS_TOKEN_COOKIE] ?? null,
+        (request: Request) => readCookie(request, ACCESS_TOKEN_COOKIE),
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
       ignoreExpiration: false,

@@ -48,7 +48,7 @@ export class IndustryService extends SluggableService<IndustryDocument> {
       .exec();
 
     if (!industry) throw new NotFoundException(`No industry found for '${slug}'.`);
-    return this.toDto(industry as unknown as LeanIndustry);
+    return this.toDto(industry);
   }
 
   async findById(id: string): Promise<IndustryDto> {
@@ -57,7 +57,7 @@ export class IndustryService extends SluggableService<IndustryDocument> {
       .lean()
       .exec();
     if (!industry) throw new NotFoundException('Industry not found.');
-    return this.toDto(industry as unknown as LeanIndustry);
+    return this.toDto(industry);
   }
 
   async resolveSlugs(slugs: string[]): Promise<Types.ObjectId[]> {
@@ -85,7 +85,7 @@ export class IndustryService extends SluggableService<IndustryDocument> {
     });
 
     this.revalidateFor(slug);
-    return this.toDto(created.toObject() as unknown as LeanIndustry);
+    return this.toDto(created.toObject());
   }
 
   async update(id: string, dto: UpdateIndustryDto): Promise<IndustryDto> {
@@ -116,7 +116,7 @@ export class IndustryService extends SluggableService<IndustryDocument> {
 
     await industry.save();
     this.revalidateFor(industry.slug, previousSlug);
-    return this.toDto(industry.toObject() as unknown as LeanIndustry);
+    return this.toDto(industry.toObject());
   }
 
   async remove(id: string): Promise<{ deleted: true }> {

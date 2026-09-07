@@ -3,6 +3,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import type { Request } from 'express';
 
+import { readCookie } from '../auth.cookies';
+
 import { AppConfigService } from '@/config/config.service';
 import { REFRESH_TOKEN_COOKIE } from '../auth.cookies';
 import type { RefreshTokenPayload } from '../auth.types';
@@ -24,7 +26,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
   constructor(config: AppConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: Request) => request?.cookies?.[REFRESH_TOKEN_COOKIE] ?? null,
+        (request: Request) => readCookie(request, REFRESH_TOKEN_COOKIE),
       ]),
       ignoreExpiration: false,
       secretOrKey: config.jwt.refreshSecret,
@@ -33,7 +35,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
   }
 
   validate(request: Request, payload: RefreshTokenPayload): RefreshRequestUser {
-    const refreshToken = request?.cookies?.[REFRESH_TOKEN_COOKIE];
+    const refreshToken = readCookie(request, REFRESH_TOKEN_COOKIE);
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token missing.');
     }

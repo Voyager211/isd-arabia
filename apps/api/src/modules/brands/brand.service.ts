@@ -40,7 +40,7 @@ export class BrandService extends SluggableService<BrandDocument> {
       .exec();
 
     if (!brand) throw new NotFoundException(`No brand found for '${slug}'.`);
-    return this.toDto(brand as unknown as LeanBrand);
+    return this.toDto(brand);
   }
 
   async findById(id: string): Promise<BrandDto> {
@@ -49,7 +49,7 @@ export class BrandService extends SluggableService<BrandDocument> {
       .lean()
       .exec();
     if (!brand) throw new NotFoundException('Brand not found.');
-    return this.toDto(brand as unknown as LeanBrand);
+    return this.toDto(brand);
   }
 
   /** Resolves slugs to ids for the product listing filter. */
@@ -70,7 +70,7 @@ export class BrandService extends SluggableService<BrandDocument> {
     const created = await this.model.create({ ...dto, slug });
 
     this.revalidateFor(slug);
-    return this.toDto(created.toObject() as unknown as LeanBrand);
+    return this.toDto(created.toObject());
   }
 
   async update(id: string, dto: UpdateBrandDto): Promise<BrandDto> {
@@ -97,7 +97,7 @@ export class BrandService extends SluggableService<BrandDocument> {
 
     await brand.save();
     this.revalidateFor(brand.slug, previousSlug);
-    return this.toDto(brand.toObject() as unknown as LeanBrand);
+    return this.toDto(brand.toObject());
   }
 
   /**

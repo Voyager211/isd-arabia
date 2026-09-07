@@ -26,7 +26,7 @@ export class CounterService {
       .lean()
       .exec();
 
-    return counter!.seq;
+    return counter.seq;
   }
 
   /**

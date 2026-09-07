@@ -192,7 +192,7 @@ export class QuotationService {
       .exec();
 
     if (!quotation) throw new NotFoundException('Quotation not found.');
-    return this.toDto(quotation as unknown as QuotationRow);
+    return this.toDto(quotation);
   }
 
   /** Every matching row, for the CSV export. Bounded so it cannot run away. */
@@ -255,7 +255,7 @@ export class QuotationService {
     quotation.status = status;
     await quotation.save();
 
-    return this.toDto(quotation.toObject() as unknown as QuotationRow);
+    return this.toDto(quotation.toObject());
   }
 
   async addNote(
@@ -274,7 +274,7 @@ export class QuotationService {
     });
 
     await quotation.save();
-    return this.toDto(quotation.toObject() as unknown as QuotationRow);
+    return this.toDto(quotation.toObject());
   }
 
   async remove(id: string): Promise<{ deleted: true }> {

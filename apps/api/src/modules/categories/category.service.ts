@@ -192,7 +192,7 @@ export class CategoryService {
     });
 
     this.revalidateFor(slug);
-    return this.toDto(created.toObject() as LeanCategory);
+    return this.toDto(created.toObject());
   }
 
   async update(id: string, dto: UpdateCategoryDto): Promise<CategoryDto> {
@@ -239,7 +239,7 @@ export class CategoryService {
     }
 
     this.revalidateFor(existing.slug, previousSlug);
-    return this.toDto(existing.toObject() as LeanCategory);
+    return this.toDto(existing.toObject());
   }
 
   /**

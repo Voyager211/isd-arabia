@@ -66,7 +66,7 @@ export class DashboardService {
       quotationsByStatus: {
         ...emptyStatusCounts(),
         ...byStatus,
-      } as Record<QuotationStatus, number>,
+      },
       quotationsPerWeek,
       recentQuotations,
     };

@@ -17,7 +17,7 @@
 export function escapeCsvField(value: unknown): string {
   if (value === null || value === undefined) return '';
 
-  let text = String(value);
+  let text = stringify(value);
 
   if (/^[=+\-@\t\r]/.test(text)) {
     text = `\t${text}`;
@@ -28,6 +28,20 @@ export function escapeCsvField(value: unknown): string {
   }
 
   return text;
+}
+
+/**
+ * Renders a cell value.
+ *
+ * Explicit per type rather than a bare `String()`: an object would otherwise
+ * land in the sheet as "[object Object]", and a Date would render in whatever
+ * locale the server happens to run in.
+ */
+function stringify(value: unknown): string {
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (value instanceof Date) return value.toISOString();
+  return JSON.stringify(value) ?? '';
 }
 
 export function toCsv(headers: string[], rows: unknown[][]): string {

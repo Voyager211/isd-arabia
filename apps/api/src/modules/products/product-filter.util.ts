@@ -59,7 +59,12 @@ export function buildDimensionFilters(input: ProductFilterInput): DimensionFilte
 export function combineFilters(
   ...parts: (Record<string, unknown> | null | undefined)[]
 ): Record<string, unknown> {
-  return Object.assign({}, ...parts.filter(Boolean));
+  // A typed reduce rather than `Object.assign({}, ...spread)`, which widens
+  // the result to `any` and silently disables checking downstream.
+  return parts.reduce<Record<string, unknown>>(
+    (combined, part) => (part ? { ...combined, ...part } : combined),
+    {},
+  );
 }
 
 export type ProductFilter = Record<string, unknown>;

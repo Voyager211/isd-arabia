@@ -35,12 +35,12 @@ export class ProductListQueryDto {
 
   @ApiPropertyOptional({ type: Boolean })
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ value }: { value: unknown }) => value === 'true' || value === true)
   featured?: boolean;
 
   @ApiPropertyOptional({ type: Boolean })
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ value }: { value: unknown }) => value === 'true' || value === true)
   newArrival?: boolean;
 
   @ApiPropertyOptional({ enum: PRODUCT_SORTS })
@@ -50,14 +50,14 @@ export class ProductListQueryDto {
 
   @ApiPropertyOptional({ minimum: 1, default: 1 })
   @IsOptional()
-  @Transform(({ value }) => Number.parseInt(String(value), 10))
+  @Transform(({ value }: { value: unknown }) => Number.parseInt(String(value), 10))
   @IsInt()
   @Min(1)
   page?: number;
 
   @ApiPropertyOptional({ minimum: 1, maximum: PRODUCT_LIST_MAX_LIMIT, default: 24 })
   @IsOptional()
-  @Transform(({ value }) => Number.parseInt(String(value), 10))
+  @Transform(({ value }: { value: unknown }) => Number.parseInt(String(value), 10))
   @IsInt()
   @Min(1)
   @Max(PRODUCT_LIST_MAX_LIMIT)

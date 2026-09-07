@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Connection } from 'mongoose';
+import { Connection, ConnectionStates } from 'mongoose';
 import { SkipThrottle } from '@nestjs/throttler';
 
 import { Public } from '../auth/decorators/public.decorator';
@@ -38,9 +38,9 @@ export class HealthController {
 
   private databaseState(): 'connected' | 'connecting' | 'disconnected' {
     switch (this.connection.readyState) {
-      case 1:
+      case ConnectionStates.connected:
         return 'connected';
-      case 2:
+      case ConnectionStates.connecting:
         return 'connecting';
       default:
         return 'disconnected';

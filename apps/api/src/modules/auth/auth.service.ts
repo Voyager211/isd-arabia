@@ -53,7 +53,7 @@ export class AuthService {
     if (!matches) throw generic;
 
     const tokens = await this.issueTokens(admin);
-    await this.persistRefreshToken(admin.id, tokens.refreshToken);
+    await this.persistRefreshToken(String(admin._id), tokens.refreshToken);
 
     admin.lastLoginAt = new Date();
     await admin.save();
@@ -87,7 +87,7 @@ export class AuthService {
     }
 
     const tokens = await this.issueTokens(admin);
-    await this.persistRefreshToken(admin.id, tokens.refreshToken);
+    await this.persistRefreshToken(String(admin._id), tokens.refreshToken);
     return tokens;
   }
 
@@ -148,7 +148,7 @@ export class AuthService {
     await admin.save();
 
     const tokens = await this.issueTokens(admin);
-    await this.persistRefreshToken(admin.id, tokens.refreshToken);
+    await this.persistRefreshToken(String(admin._id), tokens.refreshToken);
 
     return { user: this.toDto(admin), tokens };
   }
@@ -159,14 +159,14 @@ export class AuthService {
 
   private async issueTokens(admin: AdminUserDocument): Promise<TokenPair> {
     const accessPayload: AccessTokenPayload = {
-      sub: admin.id,
+      sub: String(admin._id),
       email: admin.email,
       role: admin.role,
       mustChangePassword: admin.mustChangePassword,
     };
     // jti makes every issued refresh token unique — see RefreshTokenPayload.
     const refreshPayload: RefreshTokenPayload = {
-      sub: admin.id,
+      sub: String(admin._id),
       email: admin.email,
       jti: randomUUID(),
     };
@@ -223,7 +223,7 @@ export class AuthService {
   /** Never returns `passwordHash` or `refreshTokenHash`, both `select: false`. */
   private toDto(admin: AdminUserDocument): AdminUserDto {
     return {
-      _id: admin.id,
+      _id: String(admin._id),
       name: admin.name,
       email: admin.email,
       role: admin.role,

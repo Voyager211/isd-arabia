@@ -26,7 +26,9 @@ export class SubmitQuotationCustomerDto {
   name: string;
 
   @ApiProperty()
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim().toLowerCase() : value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim().toLowerCase() : value,
+  )
   @IsEmail({}, { message: 'Enter a valid email address.' })
   @MaxLength(200)
   email: string;

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import 'reflect-metadata';
 import * as bcrypt from 'bcryptjs';
 import mongoose, { Model, Types } from 'mongoose';
@@ -104,7 +103,7 @@ async function upsertCategory(
   const slug = toSlug(input.name);
 
   const existing = await model.findOne({ slug }).select('_id').lean().exec();
-  if (existing) return existing._id as Types.ObjectId;
+  if (existing) return existing._id;
 
   const created = await model.create({
     name: input.name,
@@ -117,7 +116,7 @@ async function upsertCategory(
     isActive: true,
   });
 
-  return created._id as Types.ObjectId;
+  return created._id;
 }
 
 async function seedTree(

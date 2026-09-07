@@ -143,7 +143,7 @@ export class CatalogueService {
     }
 
     this.revalidation.revalidate([CacheTag.catalogue, CacheTag.home]);
-    return this.toDto(created.toObject() as unknown as CatalogueFileRow);
+    return this.toDto(created.toObject());
   }
 
   async update(id: string, dto: UpdateCatalogueFileDto): Promise<CatalogueFileDto> {
@@ -166,7 +166,7 @@ export class CatalogueService {
     await file.save();
     this.revalidation.revalidate([CacheTag.catalogue, CacheTag.home]);
 
-    return this.toDto(file.toObject() as unknown as CatalogueFileRow);
+    return this.toDto(file.toObject());
   }
 
   /**

@@ -39,14 +39,14 @@ export class QuotationListQueryDto {
 
   @ApiPropertyOptional({ default: 1 })
   @IsOptional()
-  @Transform(({ value }) => Number.parseInt(String(value), 10))
+  @Transform(({ value }: { value: unknown }) => Number.parseInt(String(value), 10))
   @IsInt()
   @Min(1)
   page?: number;
 
   @ApiPropertyOptional({ default: 25, maximum: 100 })
   @IsOptional()
-  @Transform(({ value }) => Number.parseInt(String(value), 10))
+  @Transform(({ value }: { value: unknown }) => Number.parseInt(String(value), 10))
   @IsInt()
   @Min(1)
   @Max(100)

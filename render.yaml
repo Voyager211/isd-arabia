@@ -1,0 +1,72 @@
+# Render blueprint for the API (PROJECT_PLAN.md §14.4).
+#
+# The free tier sleeps after 15 minutes of inactivity with a 30–50s cold start,
+# so UptimeRobot must be pointed at /api/v1/health every 5 minutes. Note the
+# 750 instance-hours per month cover exactly ONE always-on service — a staging
+# API on the same account has to be allowed to sleep.
+services:
+  - type: web
+    name: isd-arabia-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: main
+    healthCheckPath: /api/v1/health
+
+    # shared-types is built first; the API compiles against its dist output.
+    buildCommand: npm ci && npm run build:types && npm run build --workspace @isd/api
+    startCommand: node apps/api/dist/main.js
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_PREFIX
+        value: /api/v1
+      - key: NODE_VERSION
+        value: '22'
+
+      # Everything below is set in the Render dashboard, never committed.
+      # The API validates all of them at boot and refuses to start if any is
+      # missing or malformed.
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB_NAME
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: SEED_ADMIN_EMAIL
+        sync: false
+      - key: SEED_ADMIN_PASSWORD
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: CLOUDINARY_UPLOAD_FOLDER
+        sync: false
+      - key: STOREFRONT_ORIGIN
+        sync: false
+      - key: ADMIN_ORIGIN
+        sync: false
+      - key: STOREFRONT_REVALIDATE_URL
+        sync: false
+      - key: REVALIDATE_SECRET
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: QUOTATION_NOTIFY_TO
+        sync: false
+      - key: TURNSTILE_SECRET_KEY
+        sync: false

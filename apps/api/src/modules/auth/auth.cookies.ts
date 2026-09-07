@@ -1,4 +1,4 @@
-import type { CookieOptions, Response } from 'express';
+import type { CookieOptions, Request, Response } from 'express';
 
 export const ACCESS_TOKEN_COOKIE = 'isd_at';
 export const REFRESH_TOKEN_COOKIE = 'isd_rt';
@@ -77,4 +77,17 @@ export function durationToMs(duration: string): number {
     );
   }
   return Number(match[1]) * DURATION_UNITS[match[2].toLowerCase()];
+}
+
+/**
+ * Reads one cookie off the request.
+ *
+ * Express types `req.cookies` as `any`, so every direct access spreads that
+ * `any` outward. Narrowing it once here keeps the strategies type-safe and
+ * gives one place to change if the transport ever moves off cookies.
+ */
+export function readCookie(request: Request, name: string): string | null {
+  const jar = (request as { cookies?: Record<string, unknown> }).cookies;
+  const value = jar?.[name];
+  return typeof value === 'string' && value.length > 0 ? value : null;
 }
