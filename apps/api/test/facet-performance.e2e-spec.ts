@@ -7,7 +7,12 @@ import request from 'supertest';
 import type { Model } from 'mongoose';
 import { Types } from 'mongoose';
 
-import { applyTestEnv, startTestDatabase, stopTestDatabase } from './setup-e2e';
+import {
+  applyTestEnv,
+  listenOnEphemeralPort,
+  startTestDatabase,
+  stopTestDatabase,
+} from './setup-e2e';
 
 /**
  * Facet aggregation at catalogue scale (PROJECT_PLAN.md §17.1 risk 4).
@@ -99,6 +104,10 @@ describe('Facet performance at scale (e2e)', () => {
     );
     app.useGlobalFilters(new AllExceptionsFilter(false));
     await app.init();
+
+    // Bind once: supertest would otherwise race to bind per request, which
+    // breaks the concurrent tests on CI. See setup-e2e.ts.
+    await listenOnEphemeralPort(app.getHttpServer());
 
     const categoryModel: Model<Record<string, unknown>> = moduleRef.get(
       getModelToken(Category.name),

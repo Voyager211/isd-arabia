@@ -8,7 +8,12 @@ import type { Model } from 'mongoose';
 import { Types } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 
-import { applyTestEnv, startTestDatabase, stopTestDatabase } from './setup-e2e';
+import {
+  applyTestEnv,
+  listenOnEphemeralPort,
+  startTestDatabase,
+  stopTestDatabase,
+} from './setup-e2e';
 
 /**
  * Quotation e2e (PROJECT_PLAN.md §7.6, §10, acceptance criteria #8, #22–23,
@@ -87,6 +92,10 @@ describe('Quotations (e2e)', () => {
     );
     app.useGlobalFilters(new AllExceptionsFilter(false));
     await app.init();
+
+    // Bind once: supertest would otherwise race to bind per request, which
+    // breaks the concurrent tests on CI. See setup-e2e.ts.
+    await listenOnEphemeralPort(app.getHttpServer());
 
     models = {
       product: moduleRef.get(getModelToken(Product.name)),
@@ -255,7 +264,17 @@ describe('Quotations (e2e)', () => {
     it('allocates unique sequential numbers under concurrent submissions', async () => {
       // Acceptance criterion #28. `countDocuments() + 1` passes a sequential
       // test and fails this one, which is exactly why it exists.
-      const responses = await Promise.all(
+      /**
+       * The concurrency is the test. Lowering it to make CI happier would
+       * remove the only reason this exists — `countDocuments() + 1` passes a
+       * sequential test and only fails under simultaneous load.
+       *
+       * Retrying a failed request would be worse than useless here: a reset
+       * connection may already have allocated a number, so a retry could
+       * submit twice and break the contiguity assertion below — or hide a
+       * genuine duplicate, which is the bug being hunted.
+       */
+      const settled = await Promise.allSettled(
         Array.from({ length: 12 }, () =>
           request(app.getHttpServer())
             .post('/api/v1/quotations')
@@ -265,6 +284,22 @@ describe('Quotations (e2e)', () => {
             .send(validBody([{ productId: String(productIds.nozzle), quantity: 1 }])),
         ),
       );
+
+      // A transport-level failure is a real signal now that the harness binds
+      // its server up front, so name it rather than letting it surface as an
+      // opaque ECONNRESET.
+      const transportFailures = settled
+        .filter((entry): entry is PromiseRejectedResult => entry.status === 'rejected')
+        .map((entry) => (entry.reason as Error).message);
+
+      expect(transportFailures).toEqual([]);
+
+      const responses = settled
+        .filter(
+          (entry): entry is PromiseFulfilledResult<request.Response> =>
+            entry.status === 'fulfilled',
+        )
+        .map((entry) => entry.value);
 
       const numbers = responses
         .filter((response) => response.status === 201)

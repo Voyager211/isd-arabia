@@ -8,7 +8,12 @@ import type { Model } from 'mongoose';
 import { Types } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 
-import { applyTestEnv, startTestDatabase, stopTestDatabase } from './setup-e2e';
+import {
+  applyTestEnv,
+  listenOnEphemeralPort,
+  startTestDatabase,
+  stopTestDatabase,
+} from './setup-e2e';
 
 /**
  * Catalogue e2e (PROJECT_PLAN.md §8.1, acceptance criteria #2, #19, #30).
@@ -75,6 +80,10 @@ describe('Catalogue (e2e)', () => {
     );
     app.useGlobalFilters(new AllExceptionsFilter(false));
     await app.init();
+
+    // Bind once: supertest would otherwise race to bind per request, which
+    // breaks the concurrent tests on CI. See setup-e2e.ts.
+    await listenOnEphemeralPort(app.getHttpServer());
 
     models = {
       category: moduleRef.get(getModelToken(Category.name)),

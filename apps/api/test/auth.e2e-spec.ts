@@ -7,7 +7,12 @@ import request from 'supertest';
 import type { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 
-import { applyTestEnv, startTestDatabase, stopTestDatabase } from './setup-e2e';
+import {
+  applyTestEnv,
+  listenOnEphemeralPort,
+  startTestDatabase,
+  stopTestDatabase,
+} from './setup-e2e';
 
 /**
  * Auth e2e (PROJECT_PLAN.md §12, acceptance criteria #16, #17, #26, #29).
@@ -60,6 +65,10 @@ describe('Admin auth (e2e)', () => {
     );
     app.useGlobalFilters(new AllExceptionsFilter(false));
     await app.init();
+
+    // Bind once: supertest would otherwise race to bind per request, which
+    // breaks the concurrent tests on CI. See setup-e2e.ts.
+    await listenOnEphemeralPort(app.getHttpServer());
 
     adminModel = moduleRef.get(getModelToken(AdminUser.name));
   }, 120_000);

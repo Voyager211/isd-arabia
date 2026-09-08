@@ -75,3 +75,28 @@ export function applyTestEnv(mongoUri: string): void {
     TURNSTILE_ENABLED: 'false',
   });
 }
+
+/**
+ * Binds the application's HTTP server once, before any request is made.
+ *
+ * Supertest calls `server.listen(0)` itself when handed a server that is not
+ * yet listening. That is harmless for sequential requests, but a
+ * `Promise.all` of N requests becomes N concurrent attempts to bind an
+ * ephemeral port on the same server object — which races, and on a constrained
+ * CI runner surfaces as `read ECONNRESET`.
+ *
+ * The failure looks like an application problem under concurrent load and is
+ * not: it is the harness fighting itself. Binding up front means every later
+ * `request(server)` reuses the one listening socket.
+ */
+export async function listenOnEphemeralPort(server: import('node:http').Server): Promise<void> {
+  if (server.listening) return;
+
+  await new Promise<void>((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', () => {
+      server.removeListener('error', reject);
+      resolve();
+    });
+  });
+}
