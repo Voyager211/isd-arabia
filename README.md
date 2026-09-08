@@ -147,8 +147,26 @@ npm run test:e2e --workspace @isd/api
 
 The API sleeps after 15 minutes idle on Render's free tier, so the first
 request after a quiet spell takes 30–50 seconds. That is a cold start, not a
-failure — point UptimeRobot at the health endpoint every 5 minutes to keep it
-warm.
+failure.
+
+**Sleeping is the deliberate default here.** `PROJECT_PLAN.md` §14.2 assumes an
+always-on service kept warm by a 5-minute pinger, which costs ~730 of Render's
+750 monthly instance-hours — the whole budget, for one service. These are
+portfolio deployments, so the cold start is cheaper than the hours.
+
+Before a demo, wake it manually about a minute ahead:
+
+```bash
+curl https://isd-arabia-api.onrender.com/api/v1/health
+```
+
+Or enable an UptimeRobot monitor on `/api/v1/health` at a 5-minute interval for
+as long as you need it. Point it at the health endpoint, never the root — the
+API serves nothing at `/` and a monitor will read that 404 as an outage.
+
+The storefront degrades well while the API is asleep: ISR serves the cached
+pages, so a visitor still sees the catalogue. Only fresh data and the forms
+wait on the cold start.
 
 ## API documentation
 
