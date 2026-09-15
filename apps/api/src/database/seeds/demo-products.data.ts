@@ -93,13 +93,44 @@ function createRandom(seed: number) {
   };
 }
 
+/**
+ * A category with no hand-written pattern is named after itself, so a product
+ * under "Fire Blankets" is a fire blanket rather than a generic "Assembly".
+ * Without a name the old generic pattern stands, which keeps the facet
+ * performance data identical run to run.
+ */
+function patternFor(categorySlug: string, categoryName?: string) {
+  const known = PATTERNS[categorySlug];
+  if (known || !categoryName) return known ?? PATTERNS.default;
+
+  const initials = categorySlug
+    .split('-')
+    .map((word) => word.replace(/[^a-z]/g, '').charAt(0))
+    .join('')
+    .toUpperCase();
+
+  return {
+    nouns: [categoryName],
+    qualifiers: [
+      'Standard',
+      'Heavy Duty',
+      'Industrial Grade',
+      'Professional',
+      'Compact',
+      'Premium',
+    ],
+    prefix: initials.length >= 2 ? initials : `${initials}X`,
+  };
+}
+
 export function generateProducts(
   categorySlug: string,
   count: number,
   seed: number,
+  categoryName?: string,
 ): GeneratedProduct[] {
   const random = createRandom(seed);
-  const pattern = PATTERNS[categorySlug] ?? PATTERNS.default;
+  const pattern = patternFor(categorySlug, categoryName);
   const pick = <T>(list: readonly T[]): T => list[Math.floor(random() * list.length)];
 
   const products: GeneratedProduct[] = [];

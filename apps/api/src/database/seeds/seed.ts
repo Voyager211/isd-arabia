@@ -15,6 +15,7 @@ import {
   SEEDED_DEFAULT_PASSWORD,
   checkPasswordPolicy,
 } from '@/modules/auth/password.policy';
+import { readDemoImageManifest } from './demo-images.data';
 import { generateProducts } from './demo-products.data';
 import { explainConnectionError } from './connection-hints';
 import {
@@ -61,6 +62,13 @@ function parseCount(argv: string[]): number {
   const raw = argv.find((arg) => arg.startsWith('--count='))?.split('=')[1];
   const parsed = Number.parseInt(raw ?? '', 10);
   return Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 20_000) : 1500;
+}
+
+/** `--per-category=3` seeds exactly that many per leaf, overriding `--count`. */
+function parsePerCategory(argv: string[]): number | null {
+  const raw = argv.find((arg) => arg.startsWith('--per-category='))?.split('=')[1];
+  const parsed = Number.parseInt(raw ?? '', 10);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 500) : null;
 }
 
 async function seedAdmin(model: Model<AdminUser>, env: SeedEnv) {
@@ -241,13 +249,18 @@ async function seedDemoProducts(
   industryModel: Model<Industry>,
   env: SeedEnv,
   count: number,
+  perCategoryOverride: number | null,
 ) {
   if (env.NODE_ENV === 'production') {
     throw new Error('Refusing to seed demo products in production.');
   }
 
+  // Cloudinary images uploaded by `seed:demo-images`. Empty when that has not
+  // run, and the products are created without images as before.
+  const demoImages = readDemoImageManifest();
+
   const [categories, brands, industries] = await Promise.all([
-    categoryModel.find({ isDeleted: false }).select('_id slug ancestors').lean().exec(),
+    categoryModel.find({ isDeleted: false }).select('_id name slug ancestors').lean().exec(),
     brandModel.find({ isDeleted: false }).select('_id').lean().exec(),
     industryModel.find({ isDeleted: false }).select('_id').lean().exec(),
   ]);
@@ -264,14 +277,23 @@ async function seedDemoProducts(
     return;
   }
 
-  const perCategory = Math.max(1, Math.ceil(count / leaves.length));
+  const perCategory = perCategoryOverride ?? Math.max(1, Math.ceil(count / leaves.length));
   const documents: Record<string, unknown>[] = [];
 
   leaves.forEach((category, categoryIndex) => {
-    const generated = generateProducts(category.slug, perCategory, categoryIndex + 1);
+    const generated = generateProducts(
+      category.slug,
+      perCategory,
+      categoryIndex + 1,
+      category.name,
+    );
+    const pool = demoImages[category.slug] ?? [];
 
     generated.forEach((product, index) => {
       const slug = `${toSlug(product.name)}-${product.sku.toLowerCase()}`;
+      // Each product gets a different photo from its category's pool while
+      // the pool lasts. Alt is the product name, not the Commons file title.
+      const image = pool.length ? pool[index % pool.length] : null;
 
       documents.push({
         ...product,
@@ -284,7 +306,18 @@ async function seedDemoProducts(
         industries: industries.length
           ? [industries[(categoryIndex + index) % industries.length]._id]
           : [],
-        images: [],
+        images: image
+          ? [
+              {
+                url: image.url,
+                publicId: image.publicId,
+                alt: product.name,
+                width: image.width,
+                height: image.height,
+                order: 0,
+              },
+            ]
+          : [],
         documents: [],
         isActive: true,
         displayOrder: index,
@@ -293,7 +326,9 @@ async function seedDemoProducts(
     });
   });
 
-  const toInsert = documents.slice(0, count);
+  // An explicit per-category count is exact; `--count` is a total to trim to.
+  const toInsert = perCategoryOverride ? documents : documents.slice(0, count);
+  const withImages = toInsert.filter((document) => (document.images as unknown[]).length).length;
 
   // Batched: a single 20,000-document insertMany is a large payload for a
   // free-tier connection and fails as one all-or-nothing operation.
@@ -310,7 +345,9 @@ async function seedDemoProducts(
     inserted += Array.isArray(result) ? result.length : 0;
   }
 
-  console.log(`  · demo products: ${inserted} inserted across ${leaves.length} categories`);
+  console.log(
+    `  · demo products: ${inserted} inserted across ${leaves.length} categories (${withImages} with images)`,
+  );
   // String.raw so the regex prints literally. In a normal string literal the
   // backslashes are swallowed and the command the client pastes into mongosh
   // matches nothing.
@@ -326,6 +363,7 @@ async function main() {
   const env = validateSeedEnv(process.env);
   const sections = parseSections(process.argv.slice(2));
   const demoCount = parseCount(process.argv.slice(2));
+  const demoPerCategory = parsePerCategory(process.argv.slice(2));
 
   console.log(`Seeding '${env.MONGODB_DB_NAME}' [${env.NODE_ENV}] — ${sections.join(', ')}`);
 
@@ -352,7 +390,9 @@ async function main() {
     }
 
     if (sections.includes('demo')) {
-      console.log(`Demo products (${demoCount}):`);
+      console.log(
+        `Demo products (${demoPerCategory ? `${demoPerCategory} per category` : demoCount}):`,
+      );
       await seedDemoProducts(
         productModel,
         categoryModel,
@@ -360,6 +400,7 @@ async function main() {
         industryModel,
         env,
         demoCount,
+        demoPerCategory,
       );
     }
 
