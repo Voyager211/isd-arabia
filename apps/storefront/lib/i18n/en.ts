@@ -29,6 +29,11 @@ export const t = {
     breadcrumb: 'Breadcrumb',
   },
 
+  home: {
+    heroImageAlt:
+      'A welder in yellow gloves runs a stick weld across a steel plate, sparks spraying over the work surface',
+  },
+
   utility: {
     hours: 'Sun–Thu, 8:00–17:00 AST',
     callUs: 'Call us',

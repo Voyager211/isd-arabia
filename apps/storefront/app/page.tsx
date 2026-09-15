@@ -10,6 +10,7 @@ import { buildMetadata, jsonLdScript, organizationJsonLd } from '@/lib/seo';
 import { cloudinaryUrl } from '@/lib/cloudinary';
 import { ProductCard } from '@/components/server/product-card';
 import { CatalogueDownloadButton } from '@/components/client/catalogue-download-button';
+import heroImage from '../public/images/hero-welding.jpg';
 
 /**
  * Home page (PROJECT_PLAN.md §9.2).
@@ -92,7 +93,23 @@ export default async function HomePage() {
           </div>
 
           <div className="hidden lg:block">
-            <div className="aspect-[4/3] rounded-[var(--radius-card)] border border-white/10 bg-white/5" />
+            {/*
+              Static import, so a missing file fails the build instead of
+              shipping a broken hero, and next/image gets the dimensions and a
+              blur placeholder for free. `priority` because on desktop this is
+              the largest element above the fold — the LCP candidate.
+            */}
+            <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-card)] border border-white/10 bg-white/5">
+              <Image
+                src={heroImage}
+                alt={t.home.heroImageAlt}
+                fill
+                priority
+                placeholder="blur"
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover"
+              />
+            </div>
           </div>
         </div>
       </section>
